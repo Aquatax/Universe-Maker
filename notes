@@ -1,0 +1,47 @@
+notes
+
+Require fuel to travel to each system
+Fuel is measure in tons. it can take between 1 and 3 fuel to go to another system
+
+At each star system you can go to the station.
+At the station you can by things
+
+
+each star system will have between 1 and 10 planets
+only 1% of these planets will be habitable
+50% of these planets will be gas giants
+49% of these planets will be rocky planets
+you will start at a habitable planet so there will be atleast one
+
+you can scan the planet to determine if
+
+If the planet is rocky you can send an away team to visit it and scan it
+
+You can influence the
+
+
+
+ship battle
+player ship
+
+
+Notes on worlds
+Venus Gravity - 8.87, 0.8
+Mars - 3.721, 0.1
+Mercury 3.7 - 0.05
+
+
+Moons:
+max 12% mass of most planet per moon
+max 15% of planetary mass can be moon (ex. planets has 100 mass, max mass of moons is 15 mass)
+max moons will be arbitrary
+dwarf planets: 5
+Rocky planets: 3
+Ice Giants: 10
+Gas Giants: 15
+
+Options for a revamp of star formation
+star starts out with a given number of points.
+Ex. Red Dwarves - 55 points
+each planet type takes away a certain number of points, eg. rocky planets are 10, etc.
+Points can depend on the mass of the star
