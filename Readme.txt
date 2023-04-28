@@ -10,3 +10,5 @@ System links are randomly assigned and cannot be assumed to actually be near eac
 Current work is being made to have planets and moons and stars have realistic qualities
 eg. mass a tenth of earth but twice the gravity for planets and moons
 stars will eventually be divided into types (currently they have no qualities)
+
+the roman gods document was taken straight from wikipedia and it may be used if i want to give planets or stars names
