@@ -62,44 +62,39 @@ class makeplanet():
             given = randint(0, 100)
             if given <= chances["Dwarf Planet"]:
                 typeer = "Dwarf Planet"
-
-                mass = float(
-                    randint(int(masses["Dwarf Planet"][0] * 10000), int(masses["Dwarf Planet"][1] * 10000))) / 10000
-                gravity = round(mass * 9.8 + gravitydrop["Dwarf Planet"] * (randint(-100, 100) / 100), 3)
+                ptype = "Dwarf Planet"
 
             elif chances["Dwarf Planet"] < given <= chances["Rocky Planet"]:
                 typeer = "Rocky Planet"
-                mass = float(
-                    randint(int(masses["Rocky Planet"][0] * 10000), int(masses["Rocky Planet"][1] * 10000))) / 10000
-                gravity = round(mass * 9.8 + gravitydrop["Rocky Planet"] * (randint(-100, 100) / 100), 3)
+                ptype = "Dwarf Planet"
 
             elif chances["Rocky Planet"] < given <= chances["Super Earth"]:
                 typeer = "Super Earth"
-                mass = float(
-                    randint(int(masses["Super Earth"][0] * 10000), int(masses["Super Earth"][1] * 10000))) / 10000
-                gravity = round(mass * 9.8 + gravitydrop["Super Earth"] * (randint(-100, 100) / 100), 3)
+                ptype = "Dwarf Planet"
 
 
             elif chances["Super Earth"] < given <= chances["Ice Giant"]:
                 typeer = "Ice Giant"
-                mass = float(
-                    randint(int(masses["Ice Giant"][0] * 10000), int(masses["Ice Giant"][1] * 10000))) / 10000
+                ptype = "Gas Planet"
 
 
 
 
             else:
                 typeer = "Gas Giant"
-                gravity = randint(int(gravityrange["Gas Giant"][0] * 100), int(gravityrange["Gas Giant"][1] * 100))
-                gravity = float(gravity / 100)
-                mass = float(
-                    randint(int(masses["Gas Giant"][0] * 10000), int(masses["Gas Giant"][1] * 10000))) / 10000
+                ptype = "Gas Planet"
 
 
 
             radius = randint(radii[typeer][0], radii[typeer][1])
-            gravity = round((mass / (radius ** 2)) * 9.8, 3)
-            print(f"gravity should be {gravity}. Radius={radius}, Mass={mass}")
+            newradius = radius / 6378
+            volume = (4/3) * pi * newradius
+            core = self.coremaker(ptype)
+            newmass = core["density"] * volume
+            print(newmass)
+            gravity = newmass / (newradius ** 2)
+            ignorethis = "density"
+            print(f"gravity should be {gravity}. Radius={newradius}, Mass={newmass}, Density={core[ignorethis]}")
 
 
         else:
@@ -262,6 +257,174 @@ class makeplanet():
 
     def starfactory(self):
         pass
+
+    def coremaker(self, planettype):
+        '''
+        Accepted Value for planettype are "Gas Planet" and "Dwarf Planet".
+
+        Use "Dwarf Planet" for solid bodies, and "Gas Planet" for gasseous
+
+
+        :param planettype:
+        :return:
+        '''
+
+        def getcoreterra(whatarewetesting):
+            coresplit = randint(1, len(whatarewetesting) - 1)
+            coresplitss = []
+            corev = []
+            minsplit = 0
+            for x in range(0, coresplit):
+                newsplit = randint(minsplit, 100)
+                if newsplit != minsplit:
+                    coresplitss.append(newsplit)
+                    minsplit = newsplit
+
+            # print(coresplitss)
+            total = 0
+            for x in range(len(coresplitss)):
+
+                # print(coresplitss[x])
+                if x == 0:
+                    corev.append(coresplitss[x])
+                    total += coresplitss[x]
+                else:
+                    corev.append(coresplitss[x] - coresplitss[x - 1])
+                    total += coresplitss[x] - coresplitss[x - 1]
+
+            # print(total)
+            corev.append(100 - total)
+            # print(corev)
+            ccorev = corev
+
+            corecontents = []
+            # corecontents.append(choice(whatarewetesting))
+            # place = randint(0, len(whatarewetesting) - 1)
+            # corecontents.append(whatarewetesting[place])
+            # del(whatarewetesting[place])
+            #
+            while len(corecontents) < len(corev):
+                place = randint(0, len(whatarewetesting) - 1)
+                corecontents.append(whatarewetesting[place])
+                del (whatarewetesting[place])
+            # print(f"{corecontents}, {corev}")
+            count = 0
+            newcore = {}
+            for value in corecontents:
+                if corev[count] != 0:
+                    newcore[corecontents[count]] = corev[count]
+                    count += 1
+
+            return newcore
+
+        # Function Ends
+
+        elements = {
+            "Ice": 0.9,
+            "Iron": 7.8,
+            "Nickel": 8.9,
+            "Rock": 2.6,
+            "Sulfur": 2.1,
+            "Silicon": 2.3,
+            "Oxygen": 1.2,
+            "Magnesium": 1.7,
+            "Aluminum": 2.7,
+            "Potassium": 0.8,
+            "Hydrogen": 0.007,
+            "Helium": 0.002
+        }
+        core = ["Iron", "Nickel"]
+        mantle = ["Sulfur", "Oxygen", "Silicon", "Magnesium"]
+        crust = ["Ice", "Rock", "Sulfur", "Silicon", "Oxygen", "Magnesium", "Aluminum", "Potassium", "Iron", "Nickel"]
+        atmos = ["Hydrogen", "Helium"]
+
+        if planettype == "Dwarf Planet":
+            density = {}
+            corevalue = randint(10, 30)
+            crustvalue = randint(0, 20)
+            mantlevalue = 100 - (corevalue + crustvalue)
+            mycore = getcoreterra(core)
+            # print(mycore)
+            mymantle = getcoreterra(mantle)
+            mycrust = getcoreterra(crust)
+            totalcore = {
+                "core": mycore,
+                "core%": corevalue,
+                "mantle": mymantle,
+                "mantle%": mantlevalue,
+                "crust": mycrust,
+                "crust%": crustvalue
+
+            }
+            coredenity = 0
+            for x in mycore:
+                weight = mycore[x] / 100
+                dens = elements[x]
+                coredenity += (dens * weight)
+            density["core"] = round(coredenity, 3)
+
+            mandenity = 0
+            for x in mymantle:
+                weight = mymantle[x] / 100
+                dens = elements[x]
+                mandenity += (dens * weight)
+            density["mantle"] = round(mandenity, 3)
+
+            crudenity = 0
+            for x in mycrust:
+                weight = mycrust[x] / 100
+                dens = elements[x]
+                crudenity += (dens * weight)
+            density["crust"] = round(crudenity, 3)
+            finaldensity = 0
+            finaldensity += (corevalue / 100) * density["core"]
+            finaldensity += (mantlevalue / 100) * density["mantle"]
+            finaldensity += (crustvalue / 100) * density["crust"]
+            # print(finaldensity)
+            totalcore["density"] = round(finaldensity, 3)
+
+        if planettype == "Gas Planet":
+
+            density = {}
+            corevalue = randint(10, 30)
+            atmovalue = 100 - corevalue
+            mycore = getcoreterra(core)
+            # print(f"mycore = {mycore}")
+            myatmo = getcoreterra(atmos)
+            # print(mycore)
+            totalcore = {
+                "core": mycore,
+                "core%": corevalue,
+                "atmo": myatmo,
+                "atmo%": atmovalue
+            }
+            coredenity = 0
+            for x in mycore:
+                weight = mycore[x] / 100
+                dens = elements[x]
+                coredenity += (dens * weight)
+            density["core"] = round(coredenity, 3)
+            atmodenity = 0
+            for x in myatmo:
+                weight = myatmo[x] / 100
+                dens = elements[x]
+                atmodenity += (dens * weight)
+            density["atmosphere"] = round(atmodenity, 3)
+            finaldensity = 0
+            finaldensity += (corevalue / 100) * density["core"]
+            finaldensity += (atmovalue / 100) * density["atmosphere"]
+            # print(finaldensity)
+
+            totalcore["density"] = round(finaldensity, 3)
+        return totalcore
+
+        # print(getcore(mantle))
+
+
+
+
+
+
 #     Type represents what class of planet it is
 # Gravity is the strength of gravity at sea level
 # Mass is the number of Earth Masses

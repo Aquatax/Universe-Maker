@@ -45,3 +45,54 @@ star starts out with a given number of points.
 Ex. Red Dwarves - 55 points
 each planet type takes away a certain number of points, eg. rocky planets are 10, etc.
 Points can depend on the mass of the star
+
+
+
+formulas that would help
+Volume=(4/3)*π*(radius)^3
+mass= density*volume
+
+https://pages.uoregon.edu/jimbrau/astr121/Notes/Jupiter/jupitergrav.html#:~:text=The%20surface%20gravity%20on%20a,m1m2%20%2F%20R
+
+
+
+https://www.aanda.org/articles/aa/full_html/2017/08/aa29922-16/aa29922-16.html#:~:text=For%20low-mass%20planets%2C%20the,∝%20M0.01%20±%200.02.
+
+https://www.universetoday.com/40229/what-is-the-earths-mantle-made-of/
+density is measured in cubic cm
+denisty of different materials
+core options:
+Iron
+Nickel
+
+Mantle Options:
+Sulfer
+Oxygen
+Silicon
+Magnesium
+
+Crust options:
+Ice
+Rock
+Sulfer
+Silicon
+Oxygen
+Magnesium
+Alluminnium
+Pottasium
+Iron
+Nickel
+
+Ice: 0.9
+Iron: 7.8
+Nickel: 8.9
+Rock: 2.6
+Sulfer: 2.1
+Silicon: 2.3
+Oxygen: 1.2
+Magnesium: 1.7
+Alluminnium: 2.7
+Pottasium: 0.8
+
+
+you take the list of elemts in the core/mantle/crust and you randomly select one
