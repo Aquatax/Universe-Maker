@@ -1,8 +1,9 @@
+import math
 from random import randint
 import random
 import moonmaker
 from math import *
-
+GConstant = 6.6743 * 10**(-11)
 class makeplanet():
 
     def __init__(self):
@@ -39,12 +40,13 @@ class makeplanet():
 
         }
 
+        # This is in Meters
         radii = {
-            "Dwarf Planet": [100, 1699],
-            "Rocky Planet": [1700, 6699],
-            "Super Earth": [6700, 14099],
-            "Ice Giant": [14100, 29999],
-            "Gas Giant": [30000, 90000]
+            "Dwarf Planet": [100000, 1699000],
+            "Rocky Planet": [1700000, 7599000],
+            "Super Earth": [7600000, 14099000],
+            "Ice Giant": [14100000, 29999000],
+            "Gas Giant": [30000000, 90000000]
 
 
 
@@ -86,43 +88,51 @@ class makeplanet():
 
 
 
-            radius = randint(radii[typeer][0], radii[typeer][1])
-            newradius = radius / 6378
-            volume = (4/3) * pi * newradius
-            core = self.coremaker(ptype)
-            newmass = core["density"] * volume
-            print(newmass)
-            gravity = newmass / (newradius ** 2)
-            ignorethis = "density"
-            print(f"gravity should be {gravity}. Radius={newradius}, Mass={newmass}, Density={core[ignorethis]}")
+
 
 
         else:
             typeer = forceplanettype
-            mass = float(
-                randint(int(masses[forceplanettype][0] * 10000), int(masses[forceplanettype][1] * 10000))) / 10000
-            if mass > 120:
-                x = (float(randint(-200, 200)) / 10000)
-                print(f"xvalue = {x}")
-                radius = cbrt(mass)
+            if typeer == "Ice Giant" or typeer == "Gas Giant":
+                ptype = "Gas Planet"
             else:
-                x = (float(randint(100, 200)) / 10000)
-                print(f"xvalue = {x}")
-                radius = cbrt(mass)
-            earthradius = 6371
-            # radius = randint(radii[typeer][0], radii[typeer][1])
-            gravity = (mass / (radius)**2)
-            print(f"gravity should be {gravity}. Radius={radius}, Mass={mass}")
+                ptype = "Dwarf Planet"
 
-            # if typeer == "Ice Giant":
-            #     gravity = randint(int(gravityrange["Ice Giant"][0] * 100), int(gravityrange["Ice Giant"][1] * 100))\
-            #               / 100
-            # elif typeer == "Gas Giant":
-            #     gravity = randint(int(gravityrange["Gas Giant"][0] * 100), int(gravityrange["Gas Giant"][1] * 100))\
-            #               / 100
-            #     print("Here")
-            # else:
-            #     gravity = round(mass * 9.8 + gravitydrop[forceplanettype] * (randint(-100, 100) / 100), 3)
+        # Radius unit is in meters
+        radius = randint(radii[typeer][0], radii[typeer][1])
+
+        # volume is in meters^3
+        volume = (4 / 3) * pi * (radius **3)
+
+        core = self.coremaker(ptype)
+
+        # density is g/cm^3
+        density = core["density"]
+
+        # ndensity is kg/m^3
+        ndensity = density * 1000
+
+
+        newmass = (ndensity) * volume
+        # Mass is in
+        print(newmass)
+        gravity = GConstant * (newmass / (radius ** 2))
+        ignorethis = "density"
+        print(f"Core Info is {core}")
+        stats = {
+            "gravity": gravity,
+            "mass": newmass,
+            "volume": volume,
+            "density": core["density"],
+            "radius": radius,
+            "corestats": core
+
+        }
+        print(f"gravity should be {gravity}. Radius={radius}, Mass={newmass}, Density={ndensity}, "
+              f"Volume={volume}")
+
+
+
 
 
 
@@ -170,6 +180,7 @@ class makeplanet():
                         lifesubtypes = "Unintelligent"
 
         if include_moons == True:
+            # print("HI")
             moons = self.moonfactory(mass, typeer)
 
         return {
@@ -181,6 +192,7 @@ class makeplanet():
             "Has Life": haslife,
             "Life Subtypes": lifesubtypes,
             "Settled": settled,
+            "stats": stats,
             "Moons": moons
         }
 
@@ -416,6 +428,8 @@ class makeplanet():
             # print(finaldensity)
 
             totalcore["density"] = round(finaldensity, 3)
+        totalcore["Core Density"] = density["core"]
+
         return totalcore
 
         # print(getcore(mantle))
