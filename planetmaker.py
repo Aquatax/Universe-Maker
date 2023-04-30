@@ -115,10 +115,10 @@ class makeplanet():
 
         newmass = (ndensity) * volume
         # Mass is in
-        print(newmass)
+        # print(newmass)
         gravity = GConstant * (newmass / (radius ** 2))
         ignorethis = "density"
-        print(f"Core Info is {core}")
+        # print(f"Core Info is {core}")
         stats = {
             "gravity": gravity,
             "mass": newmass,
@@ -128,8 +128,8 @@ class makeplanet():
             "corestats": core
 
         }
-        print(f"gravity should be {gravity}. Radius={radius}, Mass={newmass}, Density={ndensity}, "
-              f"Volume={volume}")
+        # print(f"gravity should be {gravity}. Radius={radius}, Mass={newmass}, Density={ndensity}, "
+        #       f"Volume={volume}")
 
 
 
@@ -186,17 +186,19 @@ class makeplanet():
         return {
             "Type": typeer,
             "Gravity": gravity,
-            "Mass": mass,
+            "Mass": newmass,
             "Ringed": hasring,
             "Subtype": subtype,
             "Has Life": haslife,
             "Life Subtypes": lifesubtypes,
             "Settled": settled,
-            "stats": stats,
-            "Moons": moons
+            # "stats": stats,
+            "core": core,
+            "Moons": moons,
+
         }
 
-    def moonfactory(self, totalmass, planet_type):
+    def moonfactory(self, totalmass=1000000000000000000000000000000, planet_type="Gas Giant", moontype=random):
 
         moons = []
         remainingmass = totalmass * 0.15
@@ -241,7 +243,13 @@ class makeplanet():
                 if remainingmass * 1000 > totalmass:
                     currentmoon = {}
                     moonitem = random.randint(0, 4)
+                    if moontype != "random":
+                        moonitem = 0
+                        moonsizes[0] = moontype
+
+                        # print("HI")
                     moonchoice = mooninfo[moonsizes[moonitem]]
+
                     moonmass = float(random.randint(moonchoice["Mass"][0] * 100000, moonchoice["Mass"][1] * 100000)) \
                                / 100000
                     moongrav = float(random.randint(moonchoice["Gravity"][0] * 100000,
@@ -264,7 +272,9 @@ class makeplanet():
                         slots -= 0.1
                 else:
                     slots -= 1
-
+        if len(moons) == 0:
+            moons = self.moonfactory(totalmass=totalmass, planet_type=planet_type)
+            print("Error making moon, restarting")
         return moons
 
     def starfactory(self):

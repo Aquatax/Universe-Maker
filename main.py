@@ -1,110 +1,91 @@
-from random import randint
+# Goal of this file is to be where the input command is and will lead to the other files
+from galaxymaker import galaxymakerr
 import planetmaker
+import os
 
 
-# Code by Aquatax
-# Write Below Here \/ \/ \/
+# print(galaxymakerr(minimum_systems=64, include_moons=True))
+def helpcommand():
+    print('''
+    The Following are usable commands
+    Begin commands with a /
+    
+    /help
+    -provides information on commands
+    
+    /make (planet/galaxy/moon/help) (input1) (input2) (input3)
+            -allows you to make a galaxy, planet, or moon
+            /make galaxy (minimum systems) (include moons: True/False)
+            /make planet (forceplanettype: random) (include moons: True/False)
+            /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
+    
+    
+    ''')
 
-number_of_systems = 128
-number_of_overflow_systems = 64
-moon_enabled = True
+def makecommand(input1="help", input2="help", input3="help", input4="help"):
+    x = planetmaker.makeplanet()
+    try:
+        if input1 == "planet":
+            answer = x.planetfactory(include_moons=bool(input3), forceplanettype=input2)
+            for x in answer:
+                print(f"{x}: {answer[x]}")
 
-# Write above here /\ /\ /\
+            return ()
+        elif input1 == "moon":
 
-lifecounter = 0
-def system_checker(systemb, systemc):
-    if systemb == systemc:
-        return True
-    else:
-        return False
+            return (x.moonfactory(moontype=input2)[0])
+        elif input1 == "galaxy":
+            return(galaxymakerr(include_moons=bool(input3), minimum_systems=float(input2)))
 
-movements = 0
+        else:
+            print('''
+            /make (planet/galaxy/moon/help) (input1) (input2) (input3)
+            -allows you to make a galaxy, planet, or moon
+            /make galaxy (minimum systems) (include moons: True/False)
+            /make planet (forceplanettype: random) (include moons: True/False)
+            /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
+            
+            ''')
+    except(KeyError):
+        print('''
+                    /make (planet/galaxy/moon/help) (input1) (input2) (input3)
+            -allows you to make a galaxy, planet, or moon
+            /make galaxy (minimum systems) (include moons: True/False)
+            /make planet (forceplanettype: random) (include moons: True/False)
+            /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
 
-systems = {}
-for x in range(1, number_of_systems + 1 + number_of_overflow_systems):
-    newSystem = str(f"system{x}")
-    systems[newSystem] = [{"links": []}, {"planets": []}]
-
-
-systems_broken = 0
-systems["system1"][0]["links"] = [2, 3, 4, 5, 6, 7, 8, 9]
-
-# print(systems["system1"][0]["links"])
-for x in systems["system1"][0]["links"]:
-    selectSystem = f"system{x}"
-    systems[selectSystem][0]["links"].append(1)
-
-# print(systems)
-for x in range(2, number_of_systems + 1):
-
-    SysteminQuestion = f"system{x}"
-    startingLength = len(systems[SysteminQuestion][0]["links"])
-    if startingLength < 8:
-        while len(systems[SysteminQuestion][0]["links"]) < 8:
-            systema = randint(2, number_of_systems + number_of_overflow_systems)
-            while system_checker(systema, x) == True:
-                systema = randint(2, number_of_systems + number_of_overflow_systems)
-            newsysteminquestion = f"system{systema}"
-            if len(systems[newsysteminquestion][0]["links"]) < 8:
-                go = 1
-
-                # checks if the number is repeated in the list. If it does repeat in the list it will move on
-                # and not append the number
-                for z in systems[SysteminQuestion][0]["links"]:
-                    if z == systema:
-                        go = 0
-                        systems_broken += 1
-                        if SysteminQuestion == number_of_systems:
-                            go = 1
-
-                        if systems_broken > 3:
-                            go = 2
-                            systems_broken = 0
-
-                if go == 1:
-                    movements += 1
-                    systems[newsysteminquestion][0]["links"].append(x)
-                    systems[SysteminQuestion][0]["links"].append(systema)
-            elif x == newsysteminquestion:
-                pass
-
-for x in range(2, number_of_systems + 1):
-
-    SysteminQuestion = f"system{x}"
-    number_of_planets = randint(0, 10)
-    # At most 9 planets. If planet number is 0, it should skip
-    for planetnum in range(0, number_of_planets):
-        newplanet = planetmaker.makeplanet()
-        planetinfo = newplanet.planetfactory(include_moons=moon_enabled)
-        #                 Example of what would be returned
-        # return [{"Type": typeer}, {"Gravity": gravity}, {"Ringed": hasring}, {"Subtype": subtype},
-        # {"Has Life": haslife}, {"Life Subtypes": lifesubtypes}, {"Settled": settled}]
-
-        # Ideal planet dict
-        # "Planets": [{"Planet1": [{"Name": "Jupiter"}, {"Type": "Gas Giant"}, {"Ringed: True"}, {"Subtype": "Gaseous"},
-        #  {"Has Life": False}, {"Life Subtypes": None}{"Settled": False}, {"Gravity": 5}, ]}]
-
-        typeer = planetinfo["Type"]
-        grav = planetinfo["Gravity"]
-        ringed = planetinfo["Ringed"]
-        subtype = planetinfo["Subtype"]
-        haslife = planetinfo["Has Life"]
-        lifesubtype = planetinfo["Life Subtypes"]
-        settled = planetinfo["Settled"]
-
-        moons = planetinfo["Moons"]
-        planetpoint = f"planet{planetnum}"
-        if settled:
-            lifecounter += 1
-
-        newplaneta = {planetpoint: [{"Name": planetpoint}, {"Type": typeer}, {"Ringed": ringed},
-                                    {"Subtype": subtype}, {"Has Life": haslife}, {"Life Subtypes": lifesubtype},
-                                    {"Settled": settled}, {"Gravity": grav}, {"Moons": moons}]}
-        systems[SysteminQuestion][1]["planets"].append(newplaneta)
+                    ''')
+        return
 
 
 
-print(systems)
-print()
-print(f"There are {lifecounter} settled planets in this universe")
+
+
+
+print("Welcome to Galaxy Creator")
+print("Use / to start a command. Try /help")
+while True:
+    command = input("Input Command:")
+    command[0].lower()
+    if command[0] == "/":
+        command = command.split()
+        spot = 0
+        for value in command:
+            if value == "True":
+                command[spot] = True
+            elif value.lower() == "false":
+                command[spot] = False
+            spot += 1
+
+        if command[0].lower() == "/help":
+            helpcommand()
+            input("Any button to continue")
+            os.system('cls')
+        elif command[0] == "/make":
+
+            command.append("vacantslot")
+            command.append("vacantslot")
+            command.append("vacantslot")
+            answer = makecommand(command[1], command[2], command[3])
+            print(answer)
 

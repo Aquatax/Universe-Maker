@@ -47,10 +47,20 @@ each planet type takes away a certain number of points, eg. rocky planets are 10
 Points can depend on the mass of the star
 
 
+for a moon id want to start with the density and the mass
+I need to find the gravity, radius, and volume
+volume = mass / density
+radius = cbrt((3 * volume) / (4 * pi))
+gravity = GConstant * (mass / (radius ** 2))
+
+
 
 formulas that would help
+GConstant = 6.6743 * 10**(-8)
+radius = cbrt((3 * volume) / (4 * pi))
 Volume=(4/3)*π*(radius)^3
 mass= density*volume
+gravity = GConstant * (mass / (radius ** 2))
 
 https://pages.uoregon.edu/jimbrau/astr121/Notes/Jupiter/jupitergrav.html#:~:text=The%20surface%20gravity%20on%20a,m1m2%20%2F%20R
 
@@ -95,4 +105,4 @@ Alluminnium: 2.7
 Pottasium: 0.8
 
 
-you take the list of elemts in the core/mantle/crust and you randomly select one
+
