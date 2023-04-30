@@ -2,7 +2,7 @@
 from galaxymaker import galaxymakerr
 import planetmaker
 import os
-
+import json
 
 # print(galaxymakerr(minimum_systems=64, include_moons=True))
 def helpcommand():
@@ -26,7 +26,7 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
     x = planetmaker.makeplanet()
     try:
         if input1 == "planet":
-            answer = x.planetfactory(include_moons=bool(input3), forceplanettype=input2)
+            answer = x.planetfactory(include_moons=(input3), forceplanettype=input2)
             for x in answer:
                 print(f"{x}: {answer[x]}")
 
@@ -35,7 +35,14 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
 
             return (x.moonfactory(moontype=input2)[0])
         elif input1 == "galaxy":
-            return(galaxymakerr(include_moons=bool(input3), minimum_systems=float(input2)))
+
+
+            galaxydict = galaxymakerr(include_moons=(input3), minimum_systems=float(input2))
+            # Serializing json
+            json_object = json.dumps(galaxydict, indent=4)
+            print(json_object)
+            return
+
 
         else:
             print('''

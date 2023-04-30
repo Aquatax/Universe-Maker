@@ -3,7 +3,10 @@ from random import randint
 import random
 import moonmaker
 from math import *
-GConstant = 6.6743 * 10**(-11)
+
+GConstant = 6.6743 * 10 ** (-11)
+
+
 class makeplanet():
 
     def __init__(self):
@@ -23,22 +26,6 @@ class makeplanet():
             "Ice Giant": 80,
             "Gas Giant": 100
         }
-        gravityrange = {
-            "Dwarf Planet": [0.01, 2],
-            "Rocky Planet": [3, 12],
-            "Super Earth": [9, 16],
-            "Ice Giant": [7, 18],
-            "Gas Giant": [10, 40]
-
-        }
-        gravitydrop = {
-            "Dwarf Planet": 0.02,
-            "Rocky Planet": 1,
-            "Super Earth": 2,
-            "Ice Giant": 3,
-            "Gas Giant": 4
-
-        }
 
         # This is in Meters
         radii = {
@@ -48,31 +35,21 @@ class makeplanet():
             "Ice Giant": [14100000, 29999000],
             "Gas Giant": [30000000, 90000000]
 
-
-
         }
 
-        masses = {
-            "Dwarf Planet": [0.005, 0.01],
-            "Rocky Planet": [0.01, 2],
-            "Super Earth": [2, 10],
-            "Ice Giant": [10, 20],
-            "Gas Giant": [20, 400]
-
-        }
         if forceplanettype == "random":
             given = randint(0, 100)
             if given <= chances["Dwarf Planet"]:
                 typeer = "Dwarf Planet"
-                ptype = "Dwarf Planet"
+                ptype = "Rocky Planet"
 
             elif chances["Dwarf Planet"] < given <= chances["Rocky Planet"]:
                 typeer = "Rocky Planet"
-                ptype = "Dwarf Planet"
+                ptype = "Rocky Planet"
 
             elif chances["Rocky Planet"] < given <= chances["Super Earth"]:
                 typeer = "Super Earth"
-                ptype = "Dwarf Planet"
+                ptype = "Rocky Planet"
 
 
             elif chances["Super Earth"] < given <= chances["Ice Giant"]:
@@ -102,7 +79,7 @@ class makeplanet():
         radius = randint(radii[typeer][0], radii[typeer][1])
 
         # volume is in meters^3
-        volume = (4 / 3) * pi * (radius **3)
+        volume = (4 / 3) * pi * (radius ** 3)
 
         core = self.coremaker(ptype)
 
@@ -111,7 +88,6 @@ class makeplanet():
 
         # ndensity is kg/m^3
         ndensity = density * 1000
-
 
         newmass = (ndensity) * volume
         # Mass is in
@@ -130,12 +106,6 @@ class makeplanet():
         }
         # print(f"gravity should be {gravity}. Radius={radius}, Mass={newmass}, Density={ndensity}, "
         #       f"Volume={volume}")
-
-
-
-
-
-
 
         if randint(0, 1) == 1:
             hasring = True
@@ -181,7 +151,7 @@ class makeplanet():
 
         if include_moons == True:
             # print("HI")
-            moons = self.moonfactory(mass, typeer)
+            moons = self.moonfactory(moontype="random", totalmass=newmass, planet_type=typeer)
 
         return {
             "Type": typeer,
@@ -198,43 +168,47 @@ class makeplanet():
 
         }
 
-    def moonfactory(self, totalmass=1000000000000000000000000000000, planet_type="Gas Giant", moontype=random):
+    def moonfactory(self, totalmass=1000000000000000000000000000000, planet_type="Gas Giant", moontype="random"):
 
         moons = []
         remainingmass = totalmass * 0.15
         moonsizes = ["moon1", "moon2", "moon3", "moon4", "moon5"]
+        # Radius is in meters
         mooninfo = {
+            # Mass is in Teragrams
             "moon1": {
-                          "Mass": [0.00001, 0.0001],
-                          "Gravity": [0.001, 0.01],
-                          "Shape": ["Irregular", "Spherical"]},
+                "Radius": [1000, 10000],
+                "Shape": ["Irregular", "Spherical"]},
             "moon2": {
-                          "Mass": [0.0001, 0.001],
-                          "Gravity": [0.01, 0.1],
-                          "Shape": ["Irregular", "Spherical"]},
+                "Radius": [10000, 100000],
+                "Shape": ["Irregular", "Spherical"]},
             "moon3": {
-                          "Mass": [0.001, 0.01],
-                          "Gravity": [0.1, 0.5],
-                          "Shape": ["Irregular", "Spherical"]},
+                "Radius": [100000, 1000000],
+                "Shape": ["Irregular", "Spherical"]},
             "moon4": {
-                          "Mass": [0.01, 0.1],
-                          "Gravity": [0.5, 1],
-                          "Shape": ["Spherical"]},
+                "Radius": [1000000, 2000000],
+                "Shape": ["Spherical"]},
             "moon5": {
-                          "Mass": [0.1, 1],
-                          "Gravity": [1, 6],
-                          "Shape": ["Spherical"]}}
+                "Radius": [2000000, 5000000],
+                "Shape": ["Spherical"]}}
+
+
         slots = 0
         if planet_type == "Dwarf Planet":
             slots = 5
+            moonitem = random.randint(0, 1)
         elif planet_type == "Rocky Planet":
             slots = 3
+            moonitem = random.randint(0, 3)
         elif planet_type == "Super Earth":
             slots = 5
+            moonitem = random.randint(0, 3)
         elif planet_type == "Ice Giant":
             slots = 10
-        elif planet_type == "Gas Giant":
+            moonitem = random.randint(0, 4)
+        else:
             slots = 15
+            moonitem = random.randint(0, 4)
 
         slots = random.randint(0, slots)
         # print(slots)
@@ -242,28 +216,62 @@ class makeplanet():
             while slots > 0:
                 if remainingmass * 1000 > totalmass:
                     currentmoon = {}
-                    moonitem = random.randint(0, 4)
-                    if moontype != "random":
+                    if moontype == "random":
+                        moontype = moonsizes[moonitem]
+                        moonradius = randint(mooninfo[moontype]["Radius"][0], mooninfo[moontype]["Radius"][1])
+
+                        print(f"Moontype = {moontype}, radius = {moonradius}")
+                    elif moontype != "random":
                         moonitem = 0
                         moonsizes[0] = moontype
+                        moonradius = randint(mooninfo[moontype]["Radius"][0], mooninfo[moontype]["Radius"][1])
 
                         # print("HI")
-                    moonchoice = mooninfo[moonsizes[moonitem]]
+                    moonchoice = mooninfo[moontype]
+                    # moonmass /= 1000000000
+                    # print(f"Moonmass = {moonmass}")
+                    if moontype == "moon1":
+                        core1 = self.coremaker(planettype="Moon")
+                    elif moontype == "moon2":
+                        core1 = self.coremaker(planettype="Moon")
+                    elif moontype == "moon3":
+                        core1 = self.coremaker(planettype="Rocky Planet")
+                    elif moontype == "moon4":
+                        core1 = self.coremaker(planettype="Rocky Planet")
+                    else:
+                        core1 = self.coremaker(planettype="Rocky Planet")
 
-                    moonmass = float(random.randint(moonchoice["Mass"][0] * 100000, moonchoice["Mass"][1] * 100000)) \
-                               / 100000
-                    moongrav = float(random.randint(moonchoice["Gravity"][0] * 100000,
-                                                    moonchoice["Gravity"][1] * 100000)) / 100000
+                    # density is g / cm ^ 3
+                    mdensity = core1["density"]
+
+                    # ndensity is kg/m^3
+                    mndensity = mdensity * 1000
+
+                    mvolume = (4 / 3) * pi * (moonradius ** 3)
+
+                    moonmass = (mndensity) * mvolume
+
+                    # radius is in meters
+
+
+
+                    moongrav = GConstant * (moonmass / (moonradius ** 2))
+                    moongrav = round(moongrav, 8)
                     moonshape = random.choice(moonchoice["Shape"])
                     # mass = mooninfo[moonchoice["Mass"]]
                     # print(remainingmass)
+                    print(f"remaining_mass = {remainingmass}")
                     remainingmass -= moonmass
+
                     if remainingmass > 0:
                         currentmoon = {
                             "Type": moonsizes[moonitem],
                             "Mass": moonmass,
                             "Gravity": moongrav,
-                            "Shape": moonshape
+                            "Radius": moonradius,
+                            "Volume": mvolume,
+                            "Shape": moonshape,
+                            "core": core1
                         }
                         slots -= 1
                         moons.append(currentmoon)
@@ -272,13 +280,31 @@ class makeplanet():
                         slots -= 0.1
                 else:
                     slots -= 1
+                if planet_type == "Dwarf Planet":
+                    moonitem = random.randint(0, 1)
+                elif planet_type == "Rocky Planet":
+                    moonitem = random.randint(0, 3)
+                elif planet_type == "Super Earth":
+                    moonitem = random.randint(0, 3)
+                elif planet_type == "Ice Giant":
+                    moonitem = random.randint(0, 4)
+                else:
+                    moonitem = random.randint(0, 4)
+                moontype = "random"
         if len(moons) == 0:
-            moons = self.moonfactory(totalmass=totalmass, planet_type=planet_type)
             print("Error making moon, restarting")
+            moons = self.moonfactory(totalmass=totalmass, planet_type=planet_type)
+
         return moons
 
     def starfactory(self):
-        pass
+        startypes = {
+
+
+
+
+
+        }
 
     def coremaker(self, planettype):
         '''
@@ -360,7 +386,39 @@ class makeplanet():
         crust = ["Ice", "Rock", "Sulfur", "Silicon", "Oxygen", "Magnesium", "Aluminum", "Potassium", "Iron", "Nickel"]
         atmos = ["Hydrogen", "Helium"]
 
-        if planettype == "Dwarf Planet":
+        if planettype == "Moon":
+            density = {}
+            corevalue = randint(10, 99)
+            crustvalue = 100 - corevalue
+            mycore = getcoreterra(core)
+            mycrust = getcoreterra(crust)
+            totalcore = {
+                "core": mycore,
+                "core%": corevalue,
+                "crust": mycrust,
+                "crust%": crustvalue
+
+            }
+            coredenity = 0
+            for x in mycore:
+                weight = mycore[x] / 100
+                dens = elements[x]
+                coredenity += (dens * weight)
+            density["core"] = round(coredenity, 3)
+
+            crudenity = 0
+            for x in mycrust:
+                weight = mycrust[x] / 100
+                dens = elements[x]
+                crudenity += (dens * weight)
+            density["crust"] = round(crudenity, 3)
+            finaldensity = 0
+            finaldensity += (corevalue / 100) * density["core"]
+            finaldensity += (crustvalue / 100) * density["crust"]
+            # print(finaldensity)
+            totalcore["density"] = round(finaldensity, 3)
+
+        if planettype == "Rocky Planet":
             density = {}
             corevalue = randint(10, 30)
             crustvalue = randint(0, 20)
@@ -443,11 +501,6 @@ class makeplanet():
         return totalcore
 
         # print(getcore(mantle))
-
-
-
-
-
 
 #     Type represents what class of planet it is
 # Gravity is the strength of gravity at sea level
