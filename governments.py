@@ -11,29 +11,26 @@ class GovernmentMaker:
                 5.68, 5.75, 5.81, 5.87, 5.93, 6, 6.2, 6.4, 6.6, 6.8, 7, 7, 8, 8, 9]
         preference_in_division = odds[randint(0, len(odds) - 1)]
         lower_house = []
-        globalists = 0
-        nationalists = 0
+
         members_in_upper = randint(30, 100)
         members_in_lower = randint(80, 200)
         preference_in_globalists_in_lower = int(preference_in_division * 10)
         preference_in_globalists_in_upper = preference_in_globalists_in_lower + randint(-5, 5)
         print(preference_in_globalists_in_upper)
         print(preference_in_globalists_in_lower)
-        # print(preference_in_globalists_in_lower)
-        # print(preference_in_globalists_in_upper)
+
         global_in_upper = int(preference_in_globalists_in_upper / 100 * members_in_upper)
-        nationalists_in_upper = members_in_upper - global_in_upper
+        isolationists_in_upper = members_in_upper - global_in_upper
         global_in_lower = int(preference_in_globalists_in_lower / 100 * members_in_lower)
-        nationalists_in_lower = members_in_lower - global_in_lower
-        # print(f"Lower House {members_in_lower}:  Nationalists={nationalists_in_lower}, Globalists={global_in_lower}")
-        # print(f"Upper House {members_in_upper}:  Nationalists={nationalists_in_upper}, Globalists={global_in_upper}")
+        isolationists_in_lower = members_in_lower - global_in_lower
+
         type_of_government = 0
         print(preference_in_division)
         return [{
             "Members In Upper": members_in_upper,
             "Members In Lower": members_in_lower,
-            "Nats In Upper": nationalists_in_upper,
-            "Nats In Lower": nationalists_in_lower,
+            "Islt In Upper": isolationists_in_upper,
+            "Islt In Lower": isolationists_in_lower,
             "Glob In Upper": global_in_upper,
             "Glob In Lower": global_in_lower
         }]

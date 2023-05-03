@@ -1,7 +1,6 @@
 import math
 from random import randint
 import random
-import moonmaker
 from math import *
 
 GConstant = 6.6743 * 10 ** (-11)
@@ -12,7 +11,7 @@ class makeplanet():
     def __init__(self):
         pass
 
-    def planetfactory(self, include_moons=False, forceplanettype="random"):
+    def planetfactory(self, include_moons=False, forceplanettype="random", forcelife=False):
         haslife = False
         lifesubtypes = "None"
         subtype = "Gaseous"
@@ -73,15 +72,21 @@ class makeplanet():
             if typeer == "Ice Giant" or typeer == "Gas Giant":
                 ptype = "Gas Planet"
             else:
-                ptype = "Dwarf Planet"
+                ptype = "Rocky Planet"
 
         # Radius unit is in meters
         radius = randint(radii[typeer][0], radii[typeer][1])
 
+        if forcelife == True and forceplanettype == "Rocky Planet":
+            radius = 6371000
+            typeer = forceplanettype
+            settled = True
+
         # volume is in meters^3
         volume = (4 / 3) * pi * (radius ** 3)
-
+        # print(f"Ptype = {ptype}")
         core = self.coremaker(ptype)
+        # print(f"Ptype = {ptype}")
 
         # density is g/cm^3
         density = core["density"]
@@ -139,7 +144,7 @@ class makeplanet():
                 subtype = "Lavaworld"
             elif value == 2:
                 subtype = "Barrenworld"
-            else:
+            if value == 3 or forcelife == True:
                 subtype = "Habitableworld"
                 if randint(0, 1) == 1:
                     haslife = True
@@ -148,6 +153,9 @@ class makeplanet():
                         settled = True
                     else:
                         lifesubtypes = "Unintelligent"
+            if forcelife:
+                settled = True
+                lifesubtypes = "Intelligent"
 
         if include_moons == True:
             # print("HI")
@@ -191,7 +199,6 @@ class makeplanet():
             "moon5": {
                 "Radius": [2000000, 5000000],
                 "Shape": ["Spherical"]}}
-
 
         slots = 0
         if planet_type == "Dwarf Planet":
@@ -253,8 +260,6 @@ class makeplanet():
 
                     # radius is in meters
 
-
-
                     moongrav = GConstant * (moonmass / (moonradius ** 2))
                     moongrav = round(moongrav, 8)
                     moonshape = random.choice(moonchoice["Shape"])
@@ -299,10 +304,6 @@ class makeplanet():
 
     def starfactory(self):
         startypes = {
-
-
-
-
 
         }
 
