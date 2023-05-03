@@ -220,7 +220,7 @@ class makeplanet():
                         moontype = moonsizes[moonitem]
                         moonradius = randint(mooninfo[moontype]["Radius"][0], mooninfo[moontype]["Radius"][1])
 
-                        print(f"Moontype = {moontype}, radius = {moonradius}")
+                        # print(f"Moontype = {moontype}, radius = {moonradius}")
                     elif moontype != "random":
                         moonitem = 0
                         moonsizes[0] = moontype
@@ -260,7 +260,7 @@ class makeplanet():
                     moonshape = random.choice(moonchoice["Shape"])
                     # mass = mooninfo[moonchoice["Mass"]]
                     # print(remainingmass)
-                    print(f"remaining_mass = {remainingmass}")
+                    # print(f"remaining_mass = {remainingmass}")
                     remainingmass -= moonmass
 
                     if remainingmass > 0:
@@ -292,7 +292,7 @@ class makeplanet():
                     moonitem = random.randint(0, 4)
                 moontype = "random"
         if len(moons) == 0:
-            print("Error making moon, restarting")
+            # print("Error making moon, restarting")
             moons = self.moonfactory(totalmass=totalmass, planet_type=planet_type)
 
         return moons

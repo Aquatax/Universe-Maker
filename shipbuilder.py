@@ -39,7 +39,7 @@ class maksship():
             self.fueluse = 8
 
         if shiptype == "random":
-            self.shiptype = types[randint(0, len(types) - 1)]
+            shiptype = types[randint(0, len(types) - 1)]
 
         if shiptype == "trader":
             self.ammo -= 1

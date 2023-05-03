@@ -153,5 +153,6 @@ def galaxymakerr(minimum_systems, include_moons=True):
                         "Gravity": grav,
                         "Moons": moons}}
                 systems[SysteminQuestion]["planets"].append(newplaneta)
+    print(lifecounter)
 
     return systems
