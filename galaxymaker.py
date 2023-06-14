@@ -2,7 +2,7 @@ import random
 from random import randint
 import planetmaker
 from formulas import planetnumber
-
+import formulas
 def galaxymakerr(minimum_systems, include_moons=True):
     # print("HERE")
     # Code by Aquatax
@@ -12,7 +12,8 @@ def galaxymakerr(minimum_systems, include_moons=True):
     number_of_overflow_systems = round(minimum_systems / 2)
 
     # Write above here /\ /\ /\
-
+    nouns = formulas.nouns
+    adjectives = formulas.adjectives
     lifecounter = 0
 
     def system_checker(systemb, systemc):
@@ -57,8 +58,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
 
     systems = {}
     for x in range(1, number_of_systems + 1 + number_of_overflow_systems):
-        systemname = random.choice(system_names) + random.choice(alphabet) + (random.choice(alphabet)) + str(
-            randint(0, 9)) + str(randint(0, 9))
+        systemname = f"{random.choice(nouns)} {random.choice(adjectives)} {(random.choice(alphabet))} "
         newSystem = str(f"system{x}")
         systems[newSystem] = {
             "Name": systemname,
@@ -175,8 +175,8 @@ def galaxymakerr(minimum_systems, include_moons=True):
         SysteminQuestion = f"system{x}"
         number_of_planets = randint(0, 10)
         if SysteminQuestion == "system1":
-            number_of_planets = randint(4, 10)
-        # At most 9 planets. If planet number is 0, it should skip
+            number_of_planets = randint(4, 9)
+        # At most 8 planets. If planet number is 0, it should skip
         # print(systems[SysteminQuestion]["Name"])
         for planetnum in range(0, number_of_planets):
             if planetnum == 0:
@@ -206,6 +206,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
                 settled = planetinfo["Settled"]
                 moons = planetinfo["Moons"]
                 planetpoint = f"planet{planetnum}"
+                core = planetinfo["core"]
                 name = systems[SysteminQuestion]["Name"] + alphalower[planetnum]
                 if settled:
                     lifecounter += 1
@@ -220,7 +221,10 @@ def galaxymakerr(minimum_systems, include_moons=True):
                         "Life Subtypes": lifesubtype,
                         "Settled": settled,
                         "Gravity": grav,
-                        "Moons": moons}}
+                        "Moons": moons,
+                        "Core": core
+                    }}
+
                 systems[SysteminQuestion]["planets"].append(newplaneta)
     # print(lifecounter)
 

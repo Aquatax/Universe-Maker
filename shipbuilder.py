@@ -73,7 +73,20 @@ class maksship():
             self.crewcapacity += 20
             self.health -= 1
             self.stubborness = randint(3, 7)
-
+        self.hold = {
+            "Hydrogen": 0,
+            "Ice": 0,
+            "Iron": 0,
+            "Nickel": 0,
+            "Rock": 0,
+            "Sulfur": 0,
+            "Silicon": 0,
+            "Oxygen": 0,
+            "Magnesium": 0,
+            "Aluminum": 0,
+            "Potassium": 0,
+            "Helium": 0
+        }
         self.shiptype = shiptype
         self.crew = self.crewcapacity
         self.size = size

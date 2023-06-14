@@ -68,3 +68,38 @@ def planetnumber(letter):
         return 14
     elif letter == "p":
         return 15
+
+def planetletter(number):
+    if number == 1:
+        return "b"
+    elif number == 2:
+        return "c"
+    elif number == 3:
+        return "d"
+    elif number == 4:
+        return "e"
+    elif number == 5:
+        return "f"
+    elif number == 6:
+        return "g"
+    elif number == 7:
+        return "h"
+    elif number == 8:
+        return "i"
+    elif number == 9:
+        return "j"
+    elif number == 10:
+        return "k"
+
+nouns = ["Warriors", "Archers", "Pheonixs", "Lions", "Hares", "Stephens", "Kings", "Queens", "Misty",
+         "Mountains", "Burrowed", "Caves", "Homers", "Bureaucrats", "Monsters", "Crabs", "Boils", "Elks",
+         "Portions", "Mans", "Creatures", "Lovely", "Stoneworks", "Snowy", "Nebulas", "Planets", "Fairy",
+         "Hunters", "Fields", "Bowmans", "Chiefs", "Cardinals", "Eagles", "Fathers", "Mothers", "Brothers",
+         "Sisters", "Uncles", "Aunts", "Stories", "Fictions", "Holidays", "Wires",
+         "Felicitys", "Susies", "Darwins", "Newtons", "Einsteins", "Curies", "Copernicans", "Faradays",
+         "Gallileos", "Hawkings"]
+adjectives = ["Clouds", "Love", "Pride", "Fall", "Birth", "Hate", "Lust", "Edge", "String", "Soup", "Pie", "Refinery",
+              "Odyssey", "Tale", "Adventure", "Thirst", "Pain", "Deep", "Order", "End", "Start", "Fart", "Shine",
+              "Rays", "Rocks", "Debris", "War", "Battle", "Judge", "Mark", "Arrival", "Grave", "Strength", "Armada",
+              "Haven", "Sea", "Surprise", "Maneuver", "Folly", "Victory", "Defeat", "Horde", "Tactics", "Run", "Dream",
+              "Theatrics", "Cold", "Heat", "Warmth", "Warning", "Tears", "Teeth", "Kiss", "Rift", "Stranger"]

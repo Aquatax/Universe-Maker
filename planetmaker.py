@@ -502,7 +502,6 @@ class makeplanet():
         return totalcore
 
         # print(getcore(mantle))
-
 #     Type represents what class of planet it is
 # Gravity is the strength of gravity at sea level
 # Mass is the number of Earth Masses

@@ -9,3 +9,4 @@ class Player:
         self.ship = shipbuilder.maksship()
         self.planet = "None"
 
+
