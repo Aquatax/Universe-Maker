@@ -1,16 +1,18 @@
 # Goal of this file is to be where the input command is and will lead to the other files
-from galaxymaker import galaxymakerr  #This is to allow for galaxy generation
-import planetmaker   #This is for planet generation
-import os   #This is to help with clearing the screen
-import player   #This created the player character
-from formulas import planetnumber, planetletter   #This is used to convert b to 2 and 2 to b
-import random     #Math
-from tkinter import *    #For the GUI
-from tkinter.ttk import *    #For the GUI
+from galaxymaker import galaxymakerr  # This is to allow for galaxy generation
+import planetmaker  # This is for planet generation
+import os  # This is to help with clearing the screen
+import player  # This created the player character
+from formulas import planetnumber, planetletter  # This is used to convert b to 2 and 2 to b
+import random  # Math
+from tkinter import *  # For the GUI
+from tkinter.ttk import *  # For the GUI
+from shipbattle import battle  # For the ship battle
+from shipbuilder import maksship  # to Generalte the ship for battle
 
 
 def clearscreen(Windows):
-    #This clears the screen. It works with def changeos to work on both linux and windows without crashing
+    # This clears the screen. It works with def changeos to work on both linux and windows without crashing
     if Windows.lower() == "yes":
         myvalue = os.system('cls')
     else:
@@ -22,7 +24,7 @@ def clearscreen(Windows):
 
 
 def changeos(fromwhere):
-    #This will change the operating system from windows to linux or visa versa to clear screen correctly
+    # This will change the operating system from windows to linux or visa versa to clear screen correctly
     global Windows
     if fromwhere == "Windows":
         Windows = "no"
@@ -43,7 +45,7 @@ def helpcommand():
     /make (planet/galaxy/moon/help) (input1) (input2) (input3)
     -allows you to make a galaxy, planet, or moon
     /make galaxy (minimum systems) (include moons: True/False)
-    /make planet (forceplanettype: random) (include moons: True/False)
+    /make planet (forceplanettype: random, 1, 2, 3, 4, 5) (include moons: True/False)
     /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5
     /system info
     --Lets you see the planets in a system along with nearby system
@@ -66,20 +68,60 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
     x = planetmaker.makeplanet()
     try:
         if input1 == "planet":
-            # Will generate a planet with or without moons as desired. Also can force the planet type
-            answer = x.planetfactory(include_moons=(input3), forceplanettype=input2)
-            for x in answer:
-                print(f"{x}: {answer[x]}")
+            if input2 != "random" and input2 != "1" and input2 != "2" and input2 != "3" and input2 != "4" and \
+                    input2 != "5" and input2 == "help" and input2 != "0":
+                print('''
+                Accepted Planet Values:
+                random: Will Generate a Random Planet
+                0:      Will Generate a Random Planet
+                1:      Will Generate a Dwarf Planet
+                2:      Will Generate a Rocky Planet
+                3:      Will Generate a Super Earth
+                4:      Will Generate a Ice Giant
+                5:      Will Generate a Gas Giant
+                example for a rocky planet with moons:
+                /make planet 2 True
+                
+                ''')
+            else:
+                if input2 == "0":
+                    input2 = "random"
+                elif input2 == "1":
+                    input2 = "Dwarf Planet"
+                elif input2 == "2":
+                    input2 = "Rocky Planet"
+                elif input2 == "3":
+                    input2 = "Super Earth"
+                elif input2 == "4":
+                    input2 = "Ice Giant"
+                elif input2 == "5":
+                    input2 = "Gas Giant"
+                # Will generate a planet with or without moons as desired. Also can force the planet type
+                answer = x.planetfactory(include_moons=input3, forceplanettype=input2)
+                for x in answer:
+                    print(f"{x}: {answer[x]}")
+                saveplanet = input("Should this be saved to a file? t/f: ").lower()
+                if saveplanet == "t":
+                    json_object = json.dumps(answer, default=lambda o: o.__dict__, sort_keys=False, indent=4)
+
+                    try:
+                        with open('myplanet.json', 'w') as fp:
+                            fp.write(json_object)
+                    except:
+                        # print("BROKE HERE")
+                        pass
+                else:
+                    pass
 
             return ()
         elif input1 == "moon":
-            #Will return a moon sample that can be used for other purposes
+            # Will return a moon sample that can be used for other purposes
             return (x.moonfactory(moontype=input2)[0])
         elif input1 == "galaxy":
             # Will generate a new galaxy and save it to the game file
             playership.system = "system1"
             galaxydict = galaxymakerr(include_moons=input3, minimum_systems=float(input2))
-            import json
+            # import json
             global galaxy
             # Serializing json
 
@@ -91,7 +133,8 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
                 with open('systems.json', 'w') as fp:
                     fp.write(json_object)
             except:
-                print("BROKE HERE")
+                # print("BROKE HERE")
+                pass
             galaxy = galaxydict
             return
 
@@ -106,8 +149,8 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
             ''')
     except(KeyError, ValueError):
         print('''
-                    /make (planet/galaxy/moon/help) (input1) (input2) (input3)
-            -allows you to make a galaxy, planet, or moon
+            /make (planet/galaxy/moon/help) (input1) (input2) (input3)
+               -allows you to make a galaxy, planet, or moon
             /make galaxy (minimum systems) (include moons: True/False)
             /make planet (forceplanettype: random) (include moons: True/False)
             /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
@@ -120,13 +163,38 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
     global Windows
     # clearscreen(Windows)
     if input1 == "info":
-        print(f"Crew={playership.ship.crew}")
+        print(f"Crew={playership.ship.crew}/{playership.ship.crewcapacity}")
         print(f"Ship Type={playership.ship.size} {playership.ship.shiptype}")
-        print(f"Health={playership.ship.health}")
-
+        print(f"Health={playership.ship.health}/{playership.ship.maxhealth}")
+        print(f"Ammo={playership.ship.ammo}/{playership.ship.maxammo}")
         print(f"Inventory={playership.ship.inventory}")
-        print(f"Crew={playership.ship.crew}")
         # clearscreen(Windows)
+    elif input1 == "battle":
+        cpromptbattle()
+    elif input1 == "refill":
+        shiprefill()
+    elif input1 == "generate":
+        if input2 == "trader" or input2 == "warship" or input2 == "diplomatic" or input2 == "transport":
+            if input3 == "small" or input3 == "medium" or input3 == "large" or input3 == "massive":
+                playership.ship = maksship(size=input3, shiptype=input2)
+            else:
+                playership.ship = maksship(size="random", shiptype=input2)
+        else:
+            if input3 == "small" or input3 == "medium" or input3 == "large" or input3 == "massive":
+                playership.ship = maksship(size=input3, shiptype="random")
+            else:
+                playership.ship = maksship(size="random", shiptype="random")
+        clearscreen(Windows)
+        shipcommand(input1="info")
+    else:
+        print('''
+        /ship info -----------------------------------  Displays player ship stats
+        /ship battle  --------------------------------  Begins a battle
+        /ship refill  --------------------------------  Resets crew, health, and ammo
+        /ship generate [ship class] [ship size] ------  Will change player ship to new ship
+           Classes: trader, transport, warship, diplomatic, random
+           Sizes: small, medium, large, massive, random
+        ''')
 
 
 def systemcommand(input1="help", input2="help", input3="help", input4="help"):
@@ -180,7 +248,9 @@ def gotocommand(input1="help", input2="help"):
                 playership.planet = "None"
                 print("Planet does not exist")
             else:
+                print(f"Now at {playership.planet}")
                 pass
+
         except(TypeError):
             pass
     else:
@@ -199,6 +269,94 @@ def gotocommand(input1="help", input2="help"):
 
 
         ''')
+
+
+def cpromptbattle():
+    beginbattle()
+    global ship1
+    global ship2
+    global newbattle
+    global cont
+    while cont:
+        print('''
+        Commands:
+        a = Attack
+        b = Board
+        r = Retreat
+        s = Surrender
+        ''')
+        command = input("=")
+        command = command.lower()
+        cont = battlecommand(command, fromscreen=0)
+
+
+def beginbattle():
+    global ship1
+    global ship2
+    global newbattle
+    global cont
+
+    ship2 = maksship()
+    ship1 = playership.ship
+    shiprefill()
+    clearscreen(Windows)
+    print(f"Health: Player {ship1.health} = {ship2.health} Enemy")
+    print(f"Ammo: Player {ship1.ammo} = {ship2.ammo} Enemy")
+    print(f"Crew: Player {ship1.crew} = {ship2.crew} Enemy")
+    newbattle = battle(ship1, ship2)
+    newbattle.retreat = 0
+    cont = True
+
+
+def battlecommand(command, fromscreen=1):
+    global ship1
+    global ship2
+    global newbattle
+    global cont
+
+    os.system('cls')
+    print(f"Health: Player {ship1.health} = {ship2.health} Enemy")
+    print(f"Ammo: Player {ship1.ammo} = {ship2.ammo} Enemy")
+    print(f"Crew: Player {ship1.crew} = {ship2.crew} Enemy")
+    # command = input("=")
+    commandreturn = newbattle.commands(ship1, ship2, cont, command)
+    ship1 = commandreturn[0]
+    ship2 = commandreturn[1]
+    if (ship2.health <= 0 or ship2.crew <= ship1.crew * 0.25) and cont:
+        print("You Won")
+        cont = False
+    if (ship1.health <= 0 or ship1.crew <= ship2.crew * 0.25) and cont:
+        cont = False
+        print("You Lost")
+    if newbattle.retreat == 1:
+        cont = False
+    elif newbattle.retreat == 2:
+        cont = False
+    artyreturn = newbattle.arty(ship1, ship2, cont)
+    try:
+        ship1 = artyreturn[0]
+        ship2 = artyreturn[1]
+
+    except TypeError:
+        if fromscreen == 1:
+            resetlowerbuttons()
+            # clearscreen(Windows)
+            return
+        else:
+            cont = False
+            return cont
+
+    if (ship1.health <= 0 or ship1.crew <= ship2.crew * 0.25) and cont:
+        cont = False
+        print("You Lost")
+    if (ship2.health <= 0 or ship2.crew <= ship1.crew * 0.25) and cont:
+        print("You Won")
+        cont = False
+    if fromscreen == 0:
+        return cont
+    elif fromscreen == 1 and cont == False:
+        resetlowerbuttons()
+        print("Game Over")
 
 
 def planetcommand(input1="help", input2="help"):
@@ -339,7 +497,11 @@ properties = {
     },
 }
 galaxy = {}
-makecommand("galaxy", "100", "False")
+# makecommand("galaxy", "100", "False")
+import json
+
+with open('systems.json') as json_file:
+    galaxy = json.load(json_file)
 
 
 def ignorethis():
@@ -349,11 +511,14 @@ def ignorethis():
 # \/  Whether this is a Windows machine or not doesnt matter, it will adjust istelf after the first command
 Windows = "yes"
 
+
 def resetlowerbuttons():
     # clearscreen(Windows)
     for x in range(9, 17):
         newstring = f'''btn{x}.configure(text=f" ", command=ignorethis)'''
         exec(newstring)
+
+
 #
 def changesystem():
     # resetlowerbuttons()
@@ -371,6 +536,7 @@ def changesystem():
 
             newstring = f'''btn{a}.configure(text=f" ", command=ignorethis)'''
             exec(newstring)
+
 
 def changeplanets():
     # clearscreen(Windows)
@@ -400,19 +566,25 @@ def changeplanets():
     #
     #         newstring = f'''btn{a}.configure(text=f" ", command=ignorethis)'''
     #         exec(newstring)
+
+
 def changesystemupdate(input2):
     gotocommand(input1="system", input2=input2)
     changesystem()
+
 
 def totravel():
     resetlowerbuttons()
     btn9.configure(text="Change System", command=changesystem)
     btn10.configure(text="Change Planet", command=changeplanets)
+
+
 # In order to use the Planet Path, you must first share two things. current_system is provided at the start of the
 # for loop. The second is current_spot. current spot is the position of the planet. The first planet has a
 # current_spot of 1. You can get the spot of the planet by doing the planetnumber() function
 # example use of planetpath: eval(planetpath)["Name"]
 planetpath = 'galaxy[current_system]["planets"][current_spot - 1]["planet" + str(str(current_spot))]'
+
 
 def systembutton():
     resetlowerbuttons()
@@ -420,12 +592,69 @@ def systembutton():
     btn10.configure(text="System Stats", command=lambda: systemcommand(input1="info"))
     pass
 
+
 def planetbutton():
     resetlowerbuttons()
     btn9.configure(text="Planet Information", command=lambda: planetcommand(input1="info"))
     btn10.configure(text="Scan Planet", command=lambda: planetcommand(input1="scan"))
     btn11.configure(text="Mine Crust", command=lambda: planetcommand(input1="mine"))
     pass
+
+
+def shipbutton():
+    resetlowerbuttons()
+    btn9.configure(text="Simulate Battle", command=lambda: shipbattlebutton())
+    btn10.configure(text="Refill Stats", command=lambda: shiprefill())
+    btn11.configure(text="Generate Ship", command=lambda: shipgeneratebutton())
+    btn12.configure(text="Player Info", command=lambda: shipcommand(input1="info"))
+
+
+def shipbattlebutton():
+    beginbattle()
+    resetlowerbuttons()
+    btn9.configure(text="Attack", command=lambda: battlecommand(command="a"))
+    btn10.configure(text="Board", command=lambda: battlecommand(command="b"))
+    btn11.configure(text="Retreat", command=lambda: battlecommand(command="r"))
+    btn12.configure(text="Surrender", command=lambda: battlecommand(command="s"))
+
+
+def shiprefill():
+    playership.ship.health = playership.ship.maxhealth
+    playership.ship.ammo = playership.ship.maxammo
+    playership.ship.crew = playership.ship.crewcapacity
+    clearscreen(Windows)
+    print("Player Ship Stats Reset")
+    print(f'''
+    Health = {playership.ship.health}
+    Ammo = {playership.ship.ammo}
+    Crew = {playership.ship.crew}
+    
+    
+    ''')
+
+
+def shipgeneratebutton():
+    resetlowerbuttons()
+    btn9.configure(text="Random", command=lambda: shipgeneratebutton2(shipclass="random"))
+    btn10.configure(text="Trader", command=lambda: shipgeneratebutton2(shipclass="trader"))
+    btn11.configure(text="Warship", command=lambda: shipgeneratebutton2(shipclass="warship"))
+    btn12.configure(text="Diplomatic", command=lambda: shipgeneratebutton2(shipclass="diplomatic"))
+    btn13.configure(text="Transport", command=lambda: shipgeneratebutton2(shipclass="transport"))
+
+
+def shipgeneratebutton2(shipclass):
+    btn9.configure(text="Random", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="random"))
+    btn10.configure(text="Small", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="small"))
+    btn11.configure(text="Medium", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="medium"))
+    btn12.configure(text="Large", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="large"))
+    btn13.configure(text="Massive", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="massive"))
+
+
+def shipgeneratebutton3(shipclass, shipsize):
+    shipcommand(input1="generate", input2=shipclass, input3=shipsize)
+    resetlowerbuttons()
+
+
 def console():
     while True:
         # No Touch \/
@@ -477,11 +706,14 @@ def console():
                     command.append("vacantslot")
                     command.append("vacantslot")
                     planetcommand(command[1], command[2])
+
+
                 elif command[0].lower() == "/exit" or command[0].lower() == "exit":
                     break
 
         except(IndexError):
             pass
+
 
 window = Tk()
 window.title("Galactic Explorer")
@@ -494,7 +726,7 @@ btn2 = Button(text="System", command=systembutton, width=15)
 btn2.grid(column=1, row=0)
 btn3 = Button(text="Planet", command=planetbutton, width=15)
 btn3.grid(column=2, row=0)
-btn4 = Button(text="Ship", command=ignorethis, width=15)
+btn4 = Button(text="Ship", command=shipbutton, width=15)
 btn4.grid(column=3, row=0)
 btn5 = Button(text="Crew", command=ignorethis, width=15)
 btn5.grid(column=4, row=0)
@@ -505,23 +737,20 @@ btn7.grid(column=6, row=0)
 btn8 = Button(text="Console", command=console, width=15)
 btn8.grid(column=7, row=0)
 # Lower Buttons
-btn9 = Button(text="Spare1", command=lambda: ignorethis(), width=15)
+btn9 = Button(text="", command=lambda: ignorethis(), width=15)
 btn9.grid(column=0, row=1)
-btn10 = Button(text="Spare2", command=ignorethis, width=15)
+btn10 = Button(text="", command=ignorethis, width=15)
 btn10.grid(column=1, row=1)
-btn11 = Button(text="Spare3", command=ignorethis, width=15)
+btn11 = Button(text="", command=ignorethis, width=15)
 btn11.grid(column=2, row=1)
-btn12 = Button(text="Spare4", command=ignorethis, width=15)
+btn12 = Button(text="", command=ignorethis, width=15)
 btn12.grid(column=3, row=1)
-btn13 = Button(text="Spare5", command=ignorethis, width=15)
+btn13 = Button(text="", command=ignorethis, width=15)
 btn13.grid(column=4, row=1)
-btn14 = Button(text="Spare6", command=ignorethis, width=15)
+btn14 = Button(text="", command=ignorethis, width=15)
 btn14.grid(column=5, row=1)
-btn15 = Button(text="Spare7", command=ignorethis, width=15)
+btn15 = Button(text="", command=ignorethis, width=15)
 btn15.grid(column=6, row=1)
-btn16 = Button(text="Spare8", command=ignorethis, width=15)
+btn16 = Button(text="", command=ignorethis, width=15)
 btn16.grid(column=7, row=1)
 window.mainloop()
-
-
-

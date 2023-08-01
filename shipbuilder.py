@@ -7,7 +7,7 @@ class maksship():
         # Ship Classes. Each ship comes with a minimum and maximum crew capacity
         # Ship classes each come with minimum and maximum ammo.
         shipsizes = ["small", "medium", "large", "massive"]
-        types = ["trader", "warship", "diplomatic", "prisonship"]
+        types = ["trader", "warship", "diplomatic", "transport"]
         if size == "random":
             size = shipsizes[randint(0, len(shipsizes) - 1)]
 
@@ -66,7 +66,7 @@ class maksship():
             self.health -= 5
             self.stubborness = randint(1, 4)
 
-        elif shiptype == "prisonship":
+        elif shiptype == "transport":
             self.ammo += 2
             self.inventory -= 7
             self.fueluse += 1
@@ -90,6 +90,8 @@ class maksship():
         self.shiptype = shiptype
         self.crew = self.crewcapacity
         self.size = size
+        self.maxhealth = self.health
+        self.maxammo = self.ammo
 
 
     # def shipfactory():
