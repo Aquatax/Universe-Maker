@@ -41,19 +41,23 @@ class makeplanet():
             if given <= chances["Dwarf Planet"]:
                 typeer = "Dwarf Planet"
                 ptype = "Rocky Planet"
+                points = 1
 
             elif chances["Dwarf Planet"] < given <= chances["Rocky Planet"]:
                 typeer = "Rocky Planet"
                 ptype = "Rocky Planet"
+                points = 5
 
             elif chances["Rocky Planet"] < given <= chances["Super Earth"]:
                 typeer = "Super Earth"
                 ptype = "Rocky Planet"
+                points = 7
 
 
             elif chances["Super Earth"] < given <= chances["Ice Giant"]:
                 typeer = "Ice Giant"
                 ptype = "Gas Planet"
+                points = 15
 
 
 
@@ -61,6 +65,7 @@ class makeplanet():
             else:
                 typeer = "Gas Giant"
                 ptype = "Gas Planet"
+                points = 20
 
 
 
@@ -176,7 +181,10 @@ class makeplanet():
 
         }
 
-    def moonfactory(self, totalmass=1000000000000000000000000000000, planet_type="Gas Giant", moontype="random"):
+    def moonfactory(self, totalmass=1000000000000000000000000000000, planet_type="Gas Giant", moontype="random",
+                    moonversion=1):
+        # moonversion 1 will use the while loop to repeat the selection process where the number of moons is decided here
+        # moonversion 2 will only return a single moon and is added later on using a different process
 
         moons = []
         remainingmass = totalmass * 0.15
@@ -186,19 +194,24 @@ class makeplanet():
             # Mass is in Teragrams
             "moon1": {
                 "Radius": [1000, 10000],
-                "Shape": ["Irregular", "Spherical"]},
+                "Shape": ["Irregular", "Spherical"],
+                "Points": 1},
             "moon2": {
                 "Radius": [10000, 100000],
-                "Shape": ["Irregular", "Spherical"]},
+                "Shape": ["Irregular", "Spherical"],
+                "Points": 2},
             "moon3": {
                 "Radius": [100000, 1000000],
-                "Shape": ["Irregular", "Spherical"]},
+                "Shape": ["Irregular", "Spherical"],
+                "Points": 4},
             "moon4": {
                 "Radius": [1000000, 2000000],
-                "Shape": ["Spherical"]},
+                "Shape": ["Spherical"],
+                "Points": 7},
             "moon5": {
                 "Radius": [2000000, 5000000],
-                "Shape": ["Spherical"]}}
+                "Shape": ["Spherical"],
+                "Points": 10}}
 
         slots = 0
         if planet_type == "Dwarf Planet":
@@ -296,17 +309,100 @@ class makeplanet():
                 else:
                     moonitem = random.randint(0, 4)
                 moontype = "random"
+                if moonversion == 2:
+                    break
         if len(moons) == 0:
             # print("Error making moon, restarting")
-            moons = self.moonfactory(totalmass=totalmass, planet_type=planet_type)
+            moons = self.moonfactory(totalmass=totalmass, planet_type=planet_type, moontype=moontype,
+                                     moonversion=moonversion)
 
         return moons
 
-    def starfactory(self):
+    def starfactory(self, wanted_star="random"):
         startypes = {
+            "O": {
+                "Values": (200, 250),
+                "Abundance": (1, 1),
+                "Radius": 10,
+                "Mass": 50,
+                "Color": "Blue",
+                "Temperature": (30000, 50000),
+            },
+            "B": {
+                "Values": (175, 199),
+                "Abundance": (2, 4),
+                "Radius": 5,
+                "Mass": 10,
+                "Color": "White-Blue",
+                "Temperature": (10000, 30000),
+            },
+            "A": {
+                "Values": (150, 174),
+                "Abundance": (5, 10),
+                "Radius": 1.7,
+                "Mass": 2,
+                "Color": "White",
+                "Temperature": (7500, 10000),
+            },
+            "F": {
+                "Values": (100, 149),
+                "Abundance": (11, 20),
+                "Radius": 1.3,
+                "Mass": 1.5,
+                "Color": "White-Yellow",
+                "Temperature": (6000, 7500),
+            },
+            "G": {
+                "Values": (70, 99),
+                "Abundance": (21, 40),
+                "Radius": 1,
+                "Mass": 1,
+                "Color": "Yellow",
+                "Temperature": (5200, 6000),
+            },
+            "K": {
+                "Values": (50, 69),
+                "Abundance": (41, 60),
+                "Radius": 0.7,
+                "Mass": 0.7,
+                "Color": "Orange",
+                "Temperature": (3700, 5200),
+            },
+            "M": {
+                "Values": (30, 49),
+                "Abundance": (61, 100),
+                "Radius": 0.2,
+                "Mass": 0.2,
+                "Color": "Red",
+                "Temperature": (3000, 3700),
+            },
 
         }
+        listtypes = ["O", "B", "A", "F", "G", "K", "M"]
+        if wanted_star == "random":
+            value = randint(1, 100)
+            for starclass in startypes:
+                if startypes[starclass]["Abundance"][0] <= value <= startypes[starclass]["Abundance"][1]:
+                    wanted_star = starclass
 
+        # print(int(round(startypes[wanted_star]["Mass"] * 100 + startypes[wanted_star]["Mass"] * 100 / 8)))
+        self.startype = {
+            "Value": random.randint(startypes[wanted_star]["Values"][0], (startypes[wanted_star]["Values"][1])),
+            "Class": wanted_star,
+            "Color": startypes[wanted_star]["Color"],
+            "Mass": random.randint(
+                int(round(startypes[wanted_star]["Mass"] * 100 - startypes[wanted_star]["Mass"] * 100 / 8)),
+                int(round(startypes[wanted_star]["Mass"] * 100 + startypes[wanted_star]["Mass"] * 100 / 8))) / 100,
+            "Radius": random.randint(
+                int(round(startypes[wanted_star]["Radius"] * 100 - startypes[wanted_star]["Radius"] * 100 / 8)),
+                int(round(startypes[wanted_star]["Radius"] * 100 + startypes[wanted_star]["Radius"] * 100 / 8))) / 100,
+            "Temperature": random.randint(startypes[wanted_star]["Temperature"][0],
+                                          (startypes[wanted_star]["Temperature"][1])),
+
+        }
+        return self.startype
+
+    # Source for Star Stuff is http://www.atlasoftheuniverse.com/startype.html
     def coremaker(self, planettype):
         '''
         Accepted Value for planettype are "Gas Planet" and "Dwarf Planet".

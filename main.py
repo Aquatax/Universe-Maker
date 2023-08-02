@@ -116,8 +116,21 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
             return ()
         elif input1 == "moon":
             # Will return a moon sample that can be used for other purposes
-            return (x.moonfactory(moontype=input2)[0])
+            newmoon = x.moonfactory(moontype=input2, moonversion=2)
+            print(newmoon)
+            contmoon = input("Should the moon be saved to a file? y/n:")
+            if contmoon.lower() == "y":
+                json_object = json.dumps(newmoon, default=lambda o: o.__dict__, sort_keys=False, indent=2)
+
+                try:
+                    with open('myMoon.json', 'w') as fp:
+                        fp.write(json_object)
+                except:
+                    print("BROKE HERE")
+                    pass
+
         elif input1 == "galaxy":
+            # print("GOT HERE")
             # Will generate a new galaxy and save it to the game file
             playership.system = "system1"
             galaxydict = galaxymakerr(include_moons=input3, minimum_systems=float(input2))
@@ -127,13 +140,13 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
 
             # print(json_object)
 
-            json_object = json.dumps(galaxydict, default=lambda o: o.__dict__, sort_keys=True, indent=2)
+            json_object = json.dumps(galaxydict, default=lambda o: o.__dict__, sort_keys=False, indent=2)
 
             try:
                 with open('systems.json', 'w') as fp:
                     fp.write(json_object)
             except:
-                # print("BROKE HERE")
+                print("BROKE HERE")
                 pass
             galaxy = galaxydict
             return
@@ -199,7 +212,7 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
 
 def systemcommand(input1="help", input2="help", input3="help", input4="help"):
     global Windows
-    # clearscreen(Windows)
+    clearscreen(Windows)
     current_system = playership.system
     if input1 == "info":
         links = "links"
@@ -208,6 +221,11 @@ def systemcommand(input1="help", input2="help", input3="help", input4="help"):
         print(f"Nearby Systems: {galaxy[current_system][links]}")
         current_planet = 1
         current_spot = 1
+        numberofstars = 0
+        for x in galaxy[current_system]["stars"]:
+            numberofstars += 1
+        print(f"Number of Stars: {numberofstars}")
+        print(f"Number of Planets: {len(galaxy[current_system]['planets'])}")
 
         if len(galaxy[current_system]["planets"]) == 0:
             print("No Planets in this system")
@@ -517,6 +535,7 @@ def resetlowerbuttons():
     for x in range(9, 17):
         newstring = f'''btn{x}.configure(text=f" ", command=ignorethis)'''
         exec(newstring)
+
 
 
 #
