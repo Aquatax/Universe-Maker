@@ -61,7 +61,7 @@ def helpcommand():
     ''')
 
 
-def makecommand(input1="help", input2="help", input3="help", input4="help"):
+def makecommand(input1="help", input2="help", input3="help", input4=True):
     # This will create a planet for fun. Does not affect the game, but may be useful for planet stats
     # When making one from scratch
     # Will be used at start to make the galaxy though
@@ -139,15 +139,15 @@ def makecommand(input1="help", input2="help", input3="help", input4="help"):
             # Serializing json
 
             # print(json_object)
+            if not input4:
+                json_object = json.dumps(galaxydict, default=lambda o: o.__dict__, sort_keys=False, indent=2)
 
-            json_object = json.dumps(galaxydict, default=lambda o: o.__dict__, sort_keys=False, indent=2)
-
-            try:
-                with open('systems.json', 'w') as fp:
-                    fp.write(json_object)
-            except:
-                print("BROKE HERE")
-                pass
+                try:
+                    with open('systems.json', 'w') as fp:
+                        fp.write(json_object)
+                except:
+                    print("BROKE HERE")
+                    pass
             galaxy = galaxydict
             return
 
@@ -187,7 +187,7 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
     elif input1 == "refill":
         shiprefill()
     elif input1 == "generate":
-        if input2 == "trader" or input2 == "warship" or input2 == "diplomatic" or input2 == "transport":
+        if input2 == "trader" or input2 == "warship" or input2 == "diplomat" or input2 == "transport":
             if input3 == "small" or input3 == "medium" or input3 == "large" or input3 == "massive":
                 playership.ship = maksship(size=input3, shiptype=input2)
             else:
@@ -205,7 +205,7 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
         /ship battle  --------------------------------  Begins a battle
         /ship refill  --------------------------------  Resets crew, health, and ammo
         /ship generate [ship class] [ship size] ------  Will change player ship to new ship
-           Classes: trader, transport, warship, diplomatic, random
+           Classes: trader, transport, warship, diplomat, random
            Sizes: small, medium, large, massive, random
         ''')
 
@@ -500,28 +500,20 @@ def planetcommand(input1="help", input2="help"):
 print("Welcome to Galaxy Creator")
 print("Use / to start a command. Try /help")
 answer = "Hi"
-playership = player.Player()
-properties = {
-    "CurrentSystem": playership.system,
-    "Player_Properties": {
-        "size": playership.ship.size,
-        "Ship Type": playership.ship.shiptype,
-        "Crewcapacity": playership.ship.crewcapacity,
-        "Ammo": playership.ship.ammo,
-        "inventory": playership.ship.inventory,
-        "fueluse": playership.ship.fueluse,
-        "health": playership.ship.health,
-        "crew": playership.ship.crew
-    },
-}
-galaxy = {}
+
+
+
 # makecommand("galaxy", "100", "False")
 import json
 
 with open('systems.json') as json_file:
     galaxy = json.load(json_file)
 
+with open('player.json') as playerfile:
+    loadingplayer = json.load(playerfile)
 
+playership = player.Player(reloading=loadingplayer)
+# print(playership.ship.crew)
 def ignorethis():
     pass
 
@@ -657,7 +649,7 @@ def shipgeneratebutton():
     btn9.configure(text="Random", command=lambda: shipgeneratebutton2(shipclass="random"))
     btn10.configure(text="Trader", command=lambda: shipgeneratebutton2(shipclass="trader"))
     btn11.configure(text="Warship", command=lambda: shipgeneratebutton2(shipclass="warship"))
-    btn12.configure(text="Diplomatic", command=lambda: shipgeneratebutton2(shipclass="diplomatic"))
+    btn12.configure(text="Diplomat", command=lambda: shipgeneratebutton2(shipclass="diplomat"))
     btn13.configure(text="Transport", command=lambda: shipgeneratebutton2(shipclass="transport"))
 
 
@@ -673,6 +665,49 @@ def shipgeneratebutton3(shipclass, shipsize):
     shipcommand(input1="generate", input2=shipclass, input3=shipsize)
     resetlowerbuttons()
 
+def settingsbutton():
+    btn9.configure(text="Save Game", command=lambda: savegame())
+    btn10.configure(text="Load Game", command=lambda: loadgame())
+    btn11.configure(text="New Galaxy", command=lambda: regenerategalaxy())
+
+def regenerategalaxy():
+    global playership
+    makecommand(input1="galaxy", input2="100", input3="True", input4=False)
+    playership = player.Player()
+    print("New Galaxy Generated. Remember to Save the galaxy to keep changes")
+
+def loadgame():
+    global galaxy
+    global playership
+    with open('systems.json') as json_file:
+        galaxy = json.load(json_file)
+
+    with open('player.json') as playerfile:
+        loadingplayer = json.load(playerfile)
+
+    playership = player.Player(reloading=loadingplayer)
+def savegame():
+    newsave = playership.saveship()
+    json_object = json.dumps(newsave, default=lambda o: o.__dict__, sort_keys=False, indent=4)
+
+    try:
+        with open('player.json', 'w') as fp:
+            fp.write(json_object)
+            print("Playerdata Saved")
+    except:
+        # print("BROKE HERE")
+        print("Playerdata Failed to Save. Please submit save file")
+        pass
+
+    json_object = json.dumps(galaxy, default=lambda o: o.__dict__, sort_keys=False, indent=2)
+
+    try:
+        with open('systems.json', 'w') as fp:
+            fp.write(json_object)
+            print("Galaxy Saved")
+    except:
+        print("Galaxy Failed to Save. Please Submit Save File")
+        pass
 
 def console():
     while True:
@@ -751,7 +786,7 @@ btn5 = Button(text="Crew", command=ignorethis, width=15)
 btn5.grid(column=4, row=0)
 btn6 = Button(text="Starbase", command=ignorethis, width=15)
 btn6.grid(column=5, row=0)
-btn7 = Button(text="Settings", command=ignorethis, width=15)
+btn7 = Button(text="Settings", command=settingsbutton, width=15)
 btn7.grid(column=6, row=0)
 btn8 = Button(text="Console", command=console, width=15)
 btn8.grid(column=7, row=0)

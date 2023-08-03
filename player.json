@@ -1,0 +1,31 @@
+{
+    "system": "system1",
+    "planet": "None",
+    "myship": {
+        "ammo": 7,
+        "crew capacity": 106,
+        "crew": 106,
+        "health": 21,
+        "maxammo": 7,
+        "maxhealth": 21,
+        "fueluse": 5,
+        "hold": {
+            "Hydrogen": 0,
+            "Ice": 0,
+            "Iron": 0,
+            "Nickel": 0,
+            "Rock": 0,
+            "Sulfur": 0,
+            "Silicon": 0,
+            "Oxygen": 0,
+            "Magnesium": 0,
+            "Aluminum": 0,
+            "Potassium": 0,
+            "Helium": 0
+        },
+        "shiptype": "trader",
+        "stubborness": 3,
+        "size": "large",
+        "inventory": 79
+    }
+}
