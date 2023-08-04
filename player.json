@@ -2,13 +2,13 @@
     "system": "system1",
     "planet": "None",
     "myship": {
-        "ammo": 7,
-        "crew capacity": 106,
-        "crew": 106,
-        "health": 21,
-        "maxammo": 7,
-        "maxhealth": 21,
-        "fueluse": 5,
+        "ammo": 9,
+        "crew capacity": 127,
+        "crew": 127,
+        "health": 20,
+        "maxammo": 9,
+        "maxhealth": 20,
+        "fueluse": 7,
         "hold": {
             "Hydrogen": 0,
             "Ice": 0,
@@ -23,9 +23,9 @@
             "Potassium": 0,
             "Helium": 0
         },
-        "shiptype": "trader",
-        "stubborness": 3,
-        "size": "large",
-        "inventory": 79
+        "shiptype": "diplomat",
+        "stubborness": 4,
+        "size": "massive",
+        "inventory": 47
     }
 }

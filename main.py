@@ -654,6 +654,7 @@ def shipgeneratebutton():
 
 
 def shipgeneratebutton2(shipclass):
+    resetlowerbuttons()
     btn9.configure(text="Random", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="random"))
     btn10.configure(text="Small", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="small"))
     btn11.configure(text="Medium", command=lambda: shipgeneratebutton3(shipclass=shipclass, shipsize="medium"))
@@ -662,19 +663,27 @@ def shipgeneratebutton2(shipclass):
 
 
 def shipgeneratebutton3(shipclass, shipsize):
+    resetlowerbuttons()
     shipcommand(input1="generate", input2=shipclass, input3=shipsize)
     resetlowerbuttons()
 
 def settingsbutton():
+    resetlowerbuttons()
     btn9.configure(text="Save Game", command=lambda: savegame())
     btn10.configure(text="Load Game", command=lambda: loadgame())
-    btn11.configure(text="New Galaxy", command=lambda: regenerategalaxy())
+    btn11.configure(text="New Galaxy", command=lambda: regenerategalaxyv2())
 
-def regenerategalaxy():
+def regenerategalaxy(starcount):
     global playership
-    makecommand(input1="galaxy", input2="100", input3="True", input4=False)
+
+    makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=False)
     playership = player.Player()
     print("New Galaxy Generated. Remember to Save the galaxy to keep changes")
+
+def regenerategalaxyv2():
+    btn9.configure(text="Small", command=lambda: regenerategalaxy(50))
+    btn10.configure(text="Medium", command=lambda: regenerategalaxy(100))
+    btn11.configure(text="Large", command=lambda: regenerategalaxy(200))
 
 def loadgame():
     global galaxy
@@ -772,39 +781,51 @@ def console():
 window = Tk()
 window.title("Galactic Explorer")
 window.config(padx=100, pady=50)
-canvas = Canvas(width=1000, height=1000, highlightthickness=0)
+
+window2 = Tk()
+window2.title("Galactic Explorer")
+window2.config(padx=100, pady=50)
+
+
+canvas = Canvas(window, width=1000, height=1000, highlightthickness=0)
+
+newcanvas = Canvas(window2, width=2000, height=1000, highlightthickness=0)
+Label(newcanvas, text="You can modify this text", font='Helvetica 18 bold').pack()
+
 # Upper Buttons
-btn1 = Button(window, text="Travel", command=lambda: totravel(), width=15)
+btn1 = Button(canvas, text="Travel", command=lambda: totravel(), width=15)
 btn1.grid(column=0, row=0)
-btn2 = Button(text="System", command=systembutton, width=15)
+btn2 = Button(canvas, text="System", command=systembutton, width=15)
 btn2.grid(column=1, row=0)
-btn3 = Button(text="Planet", command=planetbutton, width=15)
+btn3 = Button(canvas, text="Planet", command=planetbutton, width=15)
 btn3.grid(column=2, row=0)
-btn4 = Button(text="Ship", command=shipbutton, width=15)
+btn4 = Button(canvas, text="Ship", command=shipbutton, width=15)
 btn4.grid(column=3, row=0)
-btn5 = Button(text="Crew", command=ignorethis, width=15)
+btn5 = Button(canvas, text="Crew", command=ignorethis, width=15)
 btn5.grid(column=4, row=0)
-btn6 = Button(text="Starbase", command=ignorethis, width=15)
+btn6 = Button(canvas, text="Starbase", command=ignorethis, width=15)
 btn6.grid(column=5, row=0)
-btn7 = Button(text="Settings", command=settingsbutton, width=15)
+btn7 = Button(canvas, text="Settings", command=settingsbutton, width=15)
 btn7.grid(column=6, row=0)
-btn8 = Button(text="Console", command=console, width=15)
+btn8 = Button(canvas, text="Console", command=console, width=15)
 btn8.grid(column=7, row=0)
 # Lower Buttons
-btn9 = Button(text="", command=lambda: ignorethis(), width=15)
+btn9 = Button(canvas, text="", command=lambda: ignorethis(), width=15)
 btn9.grid(column=0, row=1)
-btn10 = Button(text="", command=ignorethis, width=15)
+btn10 = Button(canvas, text="", command=ignorethis, width=15)
 btn10.grid(column=1, row=1)
-btn11 = Button(text="", command=ignorethis, width=15)
+btn11 = Button(canvas, text="", command=ignorethis, width=15)
 btn11.grid(column=2, row=1)
-btn12 = Button(text="", command=ignorethis, width=15)
+btn12 = Button(canvas, text="", command=ignorethis, width=15)
 btn12.grid(column=3, row=1)
-btn13 = Button(text="", command=ignorethis, width=15)
+btn13 = Button(canvas, text="", command=ignorethis, width=15)
 btn13.grid(column=4, row=1)
-btn14 = Button(text="", command=ignorethis, width=15)
+btn14 = Button(canvas, text="", command=ignorethis, width=15)
 btn14.grid(column=5, row=1)
-btn15 = Button(text="", command=ignorethis, width=15)
+btn15 = Button(canvas, text="", command=ignorethis, width=15)
 btn15.grid(column=6, row=1)
-btn16 = Button(text="", command=ignorethis, width=15)
+btn16 = Button(canvas, text="", command=ignorethis, width=15)
 btn16.grid(column=7, row=1)
+canvas.pack()
+newcanvas.pack()
 window.mainloop()
