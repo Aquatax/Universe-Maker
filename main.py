@@ -10,7 +10,7 @@ from tkinter.ttk import *  # For the GUI
 from shipbattle import battle  # For the ship battle
 from shipbuilder import maksship  # to Generalte the ship for battle
 
-
+includedebugtoolbar = False
 def clearscreen(Windows):
     # This clears the screen. It works with def changeos to work on both linux and windows without crashing
     if Windows.lower() == "yes":
@@ -403,10 +403,13 @@ def planetcommand(input1="help", input2="help"):
         if current_planet == "None":
             print("No Planet Selected. First use /goto planet [planet letter]")
         else:
-            current_spot = planetnumber(current_planet[-1])
+            current_spot = int(planetnumber(current_planet[-1]))
             # Current_spot example is a integer, eg. b == 1, d == 3
+            print("YODALOAHIOI")
+            galaxy[current_system]["planets"][current_spot - 1][f"planet{current_spot}"]["HasBeenScannned"] = True
             try:
                 planet = eval(planetpath)
+
                 # print(f"""Name: {planet["Core"]}""")
                 for value in planet["Core"]:
                     if value == "crust":
@@ -427,8 +430,10 @@ def planetcommand(input1="help", input2="help"):
                                 highestvalue = element
                         print(f'''Most abundant resource is {highestvalue} at {planet["Core"]["atmo"][highestvalue
                         ]}%''')
+                resourcegrid()
             except(TypeError):
                 print("Planet Does Not Exist")
+
     elif input1.lower() == "mine":
         current_planet = playership.planet
         current_system = playership.system
@@ -441,6 +446,7 @@ def planetcommand(input1="help", input2="help"):
             try:
                 planet = eval(planetpath)
                 # print(f"""Name: {planet["Core"]}""")
+                # galaxy[current_system]["planets"]
                 for value in planet["Core"]:
                     if value == "crust":
                         highestvalue = ""
@@ -459,7 +465,7 @@ def planetcommand(input1="help", input2="help"):
                                 highestvalue = element
                             elementrating = planet["Core"]["atmo"][highestvalue]
 
-                print(f"{playership.ship.inventory}")
+                # print(f"{playership.ship.inventory}")
                 total_used_space = 0
                 for x in playership.ship.hold:
                     total_used_space += playership.ship.hold[x]
@@ -549,6 +555,7 @@ def changesystem():
             exec(newstring)
 
 
+
 def changeplanets():
     # clearscreen(Windows)
     resetlowerbuttons()
@@ -580,8 +587,12 @@ def changeplanets():
 
 
 def changesystemupdate(input2):
+    global newlabel
+    global canvasgrid
     gotocommand(input1="system", input2=input2)
     changesystem()
+    resourcegrid()
+
 
 
 def totravel():
@@ -695,6 +706,21 @@ def loadgame():
         loadingplayer = json.load(playerfile)
 
     playership = player.Player(reloading=loadingplayer)
+
+def testView():
+    clearscreen(Windows)
+    value = 0
+    currentsystem = playership.system
+    for x in galaxy[currentsystem]["planets"]:
+        if x[f"planet{value + 1}"]["Type"] != "Gas Giant" and x[f"planet{value + 1}"]["Type"] != "Ice Giant":
+            print(x[f"planet{value + 1}"]["Core"]["crust"])
+        else:
+            print(x[f"planet{value + 1}"]["Core"]["atmo"])
+        value += 1
+    if len(galaxy[currentsystem]["planets"]) == 0:
+        print("No Planets")
+
+
 def savegame():
     newsave = playership.saveship()
     json_object = json.dumps(newsave, default=lambda o: o.__dict__, sort_keys=False, indent=4)
@@ -717,6 +743,74 @@ def savegame():
     except:
         print("Galaxy Failed to Save. Please Submit Save File")
         pass
+def resourcegrid():
+    global newlabel
+    global canvasgrid
+    canvasgrid.destroy()
+    canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
+    canvasgrid.pack()
+    currentsystem = playership.system
+    elements = {
+        "Ice": 2,
+        "Iron": 3,
+        "Nickel": 4,
+        "Rock": 5,
+        "Sulfur": 6,
+        "Silicon": 7,
+        "Oxygen": 8,
+        "Magnesium": 9,
+        "Aluminum": 10,
+        "Potassium": 11,
+        "Hydrogen": 12,
+        "Helium": 13
+    }
+
+    for value1 in range(1, len(elements) + 3):
+
+        for cell in range(1, 10):
+            if value1 == 2:
+                newlabel = Label(canvasgrid, text="", borderwidth=13, relief="solid", width=13)
+                newlabel.grid(column=value1 - 1, row=cell)
+            else:
+                newlabel = Label(canvasgrid, text="", borderwidth=10, relief="solid", width=11)
+                newlabel.grid(column=value1 - 1, row=cell)
+    maxlocations = len(elements) - 1
+    newlabel = Label(canvasgrid, text="Planet", borderwidth=10, relief="solid", width=11)
+    newlabel.grid(column=0, row=1)
+    newlabel = Label(canvasgrid, text="Type", borderwidth=13, relief="solid", width=13)
+    newlabel.grid(column=1, row=1)
+    location = 2
+    for value in elements:
+        print(value)
+        newlabel = Label(canvasgrid, text=value, borderwidth=10, relief="solid", width=11)
+        newlabel.grid(column=location, row=1)
+        newlabel.configure()
+        location += 1
+    if len(galaxy[currentsystem]["planets"]) > 0:
+
+
+        value = 0
+        newrow = 2
+        for x in galaxy[currentsystem]["planets"]:
+            print(x[f"planet{value + 1}"]["HasBeenScannned"])
+            if x[f"planet{value + 1}"]["HasBeenScannned"]:
+                if x[f"planet{value + 1}"]["Type"] != "Gas Giant" and x[f"planet{value + 1}"]["Type"] != "Ice Giant":
+                    for crustvalue in x[f"planet{value + 1}"]["Core"]["crust"]:
+                        newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Core"]["crust"][crustvalue],
+                                         borderwidth=10, relief="solid", width=11)
+                        newlabel.grid(column=elements[crustvalue], row=newrow)
+                else:
+                    for crustvalue in x[f"planet{value + 1}"]["Core"]["atmo"]:
+                        newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Core"]["atmo"][crustvalue],
+                                         borderwidth=10, relief="solid", width=11)
+                        newlabel.grid(column=elements[crustvalue], row=newrow)
+            newlabel = Label(canvasgrid, text=f"planet{value + 1}", borderwidth=10, relief="solid", width=11)
+            newlabel.grid(column=0, row=newrow)
+            newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Type"], borderwidth=10, relief="solid", width=13)
+            newlabel.grid(column=1, row=newrow)
+            value += 1
+            newrow += 1
+
 
 def console():
     while True:
@@ -781,51 +875,63 @@ def console():
 window = Tk()
 window.title("Galactic Explorer")
 window.config(padx=100, pady=50)
-
-window2 = Tk()
-window2.title("Galactic Explorer")
-window2.config(padx=100, pady=50)
-
-
 canvas = Canvas(window, width=1000, height=1000, highlightthickness=0)
+canvas.pack()
+canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
+canvasgrid.pack()
+resourcegrid()
 
-newcanvas = Canvas(window2, width=2000, height=1000, highlightthickness=0)
-Label(newcanvas, text="You can modify this text", font='Helvetica 18 bold').pack()
 
+# resourcegrid()
+
+if includedebugtoolbar:
+    window2 = Tk()
+    window2.title("Galactic Explorer")
+    window2.config(padx=100, pady=50)
+    newcanvas = Canvas(window2, width=2000, height=1000, highlightthickness=0)
+    # Label(newcanvas, text="You can modify this text", font='Helvetica 18 bold').pack()
+    btn1 = Button(newcanvas, text="ViewResources", command=lambda: testView(), width=15)
+    btn1.grid(column=0, row=0)
+    newcanvas.pack()
+
+
+
+
+width = 19
 # Upper Buttons
-btn1 = Button(canvas, text="Travel", command=lambda: totravel(), width=15)
+btn1 = Button(canvas, text="Travel", command=lambda: totravel(), width=width)
 btn1.grid(column=0, row=0)
-btn2 = Button(canvas, text="System", command=systembutton, width=15)
+btn2 = Button(canvas, text="System", command=systembutton, width=width)
 btn2.grid(column=1, row=0)
-btn3 = Button(canvas, text="Planet", command=planetbutton, width=15)
+btn3 = Button(canvas, text="Planet", command=planetbutton, width=width)
 btn3.grid(column=2, row=0)
-btn4 = Button(canvas, text="Ship", command=shipbutton, width=15)
+btn4 = Button(canvas, text="Ship", command=shipbutton, width=width)
 btn4.grid(column=3, row=0)
-btn5 = Button(canvas, text="Crew", command=ignorethis, width=15)
+btn5 = Button(canvas, text="Crew", command=ignorethis, width=width)
 btn5.grid(column=4, row=0)
-btn6 = Button(canvas, text="Starbase", command=ignorethis, width=15)
+btn6 = Button(canvas, text="Starbase", command=ignorethis, width=width)
 btn6.grid(column=5, row=0)
-btn7 = Button(canvas, text="Settings", command=settingsbutton, width=15)
+btn7 = Button(canvas, text="Settings", command=settingsbutton, width=width)
 btn7.grid(column=6, row=0)
-btn8 = Button(canvas, text="Console", command=console, width=15)
+btn8 = Button(canvas, text="Console", command=console, width=width)
 btn8.grid(column=7, row=0)
 # Lower Buttons
-btn9 = Button(canvas, text="", command=lambda: ignorethis(), width=15)
+btn9 = Button(canvas, text="", command=lambda: ignorethis(), width=width)
 btn9.grid(column=0, row=1)
-btn10 = Button(canvas, text="", command=ignorethis, width=15)
+btn10 = Button(canvas, text="", command=ignorethis, width=width)
 btn10.grid(column=1, row=1)
-btn11 = Button(canvas, text="", command=ignorethis, width=15)
+btn11 = Button(canvas, text="", command=ignorethis, width=width)
 btn11.grid(column=2, row=1)
-btn12 = Button(canvas, text="", command=ignorethis, width=15)
+btn12 = Button(canvas, text="", command=ignorethis, width=width)
 btn12.grid(column=3, row=1)
-btn13 = Button(canvas, text="", command=ignorethis, width=15)
+btn13 = Button(canvas, text="", command=ignorethis, width=width)
 btn13.grid(column=4, row=1)
-btn14 = Button(canvas, text="", command=ignorethis, width=15)
+btn14 = Button(canvas, text="", command=ignorethis, width=width)
 btn14.grid(column=5, row=1)
-btn15 = Button(canvas, text="", command=ignorethis, width=15)
+btn15 = Button(canvas, text="", command=ignorethis, width=width)
 btn15.grid(column=6, row=1)
-btn16 = Button(canvas, text="", command=ignorethis, width=15)
+btn16 = Button(canvas, text="", command=ignorethis, width=width)
 btn16.grid(column=7, row=1)
-canvas.pack()
-newcanvas.pack()
+
+
 window.mainloop()

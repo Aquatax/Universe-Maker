@@ -66,6 +66,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
         systems[newSystem] = {
             "Name": systemname,
             "links": [],
+            "SystemScan": False,
             "planets": []
         }
     makeplanet = planetmaker.makeplanet()
@@ -264,6 +265,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
                             "Life Subtypes": lifesubtype,
                             "Settled": settled,
                             "Gravity": grav,
+                            "HasBeenScannned": False,
                             "Moons": moons,
                             "Core": core
                         }}
