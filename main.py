@@ -6,11 +6,16 @@ import player  # This created the player character
 from formulas import planetnumber, planetletter  # This is used to convert b to 2 and 2 to b
 import random  # Math
 from tkinter import *  # For the GUI
-from tkinter.ttk import *  # For the GUI
+# from tkinter.ttk import *  # For the GUI
 from shipbattle import battle  # For the ship battle
 from shipbuilder import maksship  # to Generalte the ship for battle
+# import tkinter.ttk as ttk
+import pyautogui
+
 
 includedebugtoolbar = False
+currentlines = []
+globalwidth, globalheight = pyautogui.size()
 def clearscreen(Windows):
     # This clears the screen. It works with def changeos to work on both linux and windows without crashing
     if Windows.lower() == "yes":
@@ -35,18 +40,16 @@ def changeos(fromwhere):
 
 def helpcommand():
     # This is the help command and activated with /help in the console
-    print('''
+    canvasaddline('''
     The Following are usable commands
     Begin commands with a /
-
+    
     /help
     -provides information on commands
-
+    
     /make (planet/galaxy/moon/help) (input1) (input2) (input3)
     -allows you to make a galaxy, planet, or moon
-    /make galaxy (minimum systems) (include moons: True/False)
-    /make planet (forceplanettype: random, 1, 2, 3, 4, 5) (include moons: True/False)
-    /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5
+    
     /system info
     --Lets you see the planets in a system along with nearby system
     
@@ -58,7 +61,7 @@ def helpcommand():
     
     /changeos
     --important to clear the screen properly. Use "Yes" or "No. use this if you chose the wrong one
-    ''')
+    ''', multiline=True)
 
 
 def makecommand(input1="help", input2="help", input3="help", input4=True):
@@ -66,11 +69,18 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
     # When making one from scratch
     # Will be used at start to make the galaxy though
     x = planetmaker.makeplanet()
+
+    if input4 == "T" or input4 == "True" or input4 == "t" or input4 == "true":
+        input4 = True
+    elif input4 == "F" or input4 == "False" or input4 == "f" or input4 == "false":
+        input4 = False
+
+    input4 = bool(input4)
     try:
         if input1 == "planet":
             if input2 != "random" and input2 != "1" and input2 != "2" and input2 != "3" and input2 != "4" and \
                     input2 != "5" and input2 == "help" and input2 != "0":
-                print('''
+                canvasaddline('''
                 Accepted Planet Values:
                 random: Will Generate a Random Planet
                 0:      Will Generate a Random Planet
@@ -82,7 +92,7 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
                 example for a rocky planet with moons:
                 /make planet 2 True
                 
-                ''')
+                ''', multiline=True)
             else:
                 if input2 == "0":
                     input2 = "random"
@@ -99,38 +109,43 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
                 # Will generate a planet with or without moons as desired. Also can force the planet type
                 answer = x.planetfactory(include_moons=input3, forceplanettype=input2)
                 for x in answer:
-                    print(f"{x}: {answer[x]}")
-                saveplanet = input("Should this be saved to a file? t/f: ").lower()
-                if saveplanet == "t":
+                    canvasaddline(f"{x}: {answer[x]}")
+                # saveplanet = input("Should this be saved to a file? t/f: ").lower()
+                if input4:
                     json_object = json.dumps(answer, default=lambda o: o.__dict__, sort_keys=False, indent=4)
 
                     try:
                         with open('myplanet.json', 'w') as fp:
                             fp.write(json_object)
+                        canvasaddline("Make> Planet saved as myplanet.json")
                     except:
-                        # print("BROKE HERE")
                         pass
+
                 else:
                     pass
 
             return ()
         elif input1 == "moon":
+            global globalplanet
             # Will return a moon sample that can be used for other purposes
             newmoon = x.moonfactory(moontype=input2, moonversion=2)
-            print(newmoon)
-            contmoon = input("Should the moon be saved to a file? y/n:")
-            if contmoon.lower() == "y":
+            globalplanet = {
+                "type": "moon",
+                "Data": newmoon
+            }
+            if input4:
                 json_object = json.dumps(newmoon, default=lambda o: o.__dict__, sort_keys=False, indent=2)
 
                 try:
-                    with open('myMoon.json', 'w') as fp:
+                    with open('mymoon.json', 'w') as fp:
                         fp.write(json_object)
+                    canvasaddline("Make> Moon saved as mymoon.json")
                 except:
-                    print("BROKE HERE")
+                    canvasaddline("Program Broke at Make Moon")
                     pass
 
         elif input1 == "galaxy":
-            # print("GOT HERE")
+            global gamestoppedatload
             # Will generate a new galaxy and save it to the game file
             playership.system = "system1"
             galaxydict = galaxymakerr(include_moons=input3, minimum_systems=float(input2))
@@ -138,7 +153,6 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
             global galaxy
             # Serializing json
 
-            # print(json_object)
             if not input4:
                 json_object = json.dumps(galaxydict, default=lambda o: o.__dict__, sort_keys=False, indent=2)
 
@@ -146,29 +160,30 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
                     with open('systems.json', 'w') as fp:
                         fp.write(json_object)
                 except:
-                    print("BROKE HERE")
+                    canvasaddline("Program Broke at Make Galaxy")
                     pass
             galaxy = galaxydict
+            gamestoppedatload = False
             return
 
         else:
-            print('''
+            canvasaddline('''
             /make (planet/galaxy/moon/help) (input1) (input2) (input3)
             -allows you to make a galaxy, planet, or moon
             /make galaxy (minimum systems) (include moons: True/False)
             /make planet (forceplanettype: random) (include moons: True/False)
             /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
 
-            ''')
+            ''', multiline=True)
     except(KeyError, ValueError):
-        print('''
+        canvasaddline('''
             /make (planet/galaxy/moon/help) (input1) (input2) (input3)
                -allows you to make a galaxy, planet, or moon
             /make galaxy (minimum systems) (include moons: True/False)
             /make planet (forceplanettype: random) (include moons: True/False)
             /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
 
-                    ''')
+                    ''', multiline=True)
         return
 
 
@@ -176,11 +191,11 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
     global Windows
     # clearscreen(Windows)
     if input1 == "info":
-        print(f"Crew={playership.ship.crew}/{playership.ship.crewcapacity}")
-        print(f"Ship Type={playership.ship.size} {playership.ship.shiptype}")
-        print(f"Health={playership.ship.health}/{playership.ship.maxhealth}")
-        print(f"Ammo={playership.ship.ammo}/{playership.ship.maxammo}")
-        print(f"Inventory={playership.ship.inventory}")
+        canvasaddline(f"Crew={playership.ship.crew}/{playership.ship.crewcapacity}")
+        canvasaddline(f"Ship Type={playership.ship.size} {playership.ship.shiptype}")
+        canvasaddline(f"Health={playership.ship.health}/{playership.ship.maxhealth}")
+        canvasaddline(f"Ammo={playership.ship.ammo}/{playership.ship.maxammo}")
+        canvasaddline(f"Inventory={playership.ship.inventory}")
         # clearscreen(Windows)
     elif input1 == "battle":
         cpromptbattle()
@@ -200,14 +215,14 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
         clearscreen(Windows)
         shipcommand(input1="info")
     else:
-        print('''
+        canvasaddline('''
         /ship info -----------------------------------  Displays player ship stats
         /ship battle  --------------------------------  Begins a battle
         /ship refill  --------------------------------  Resets crew, health, and ammo
         /ship generate [ship class] [ship size] ------  Will change player ship to new ship
            Classes: trader, transport, warship, diplomat, random
            Sizes: small, medium, large, massive, random
-        ''')
+        ''', multiline=True)
 
 
 def systemcommand(input1="help", input2="help", input3="help", input4="help"):
@@ -217,27 +232,27 @@ def systemcommand(input1="help", input2="help", input3="help", input4="help"):
     if input1 == "info":
         links = "links"
         name = "Name"
-        print(f"System Name: {galaxy[current_system][name]}")
-        print(f"Nearby Systems: {galaxy[current_system][links]}")
+        canvasaddline(f"System Name: {galaxy[current_system][name]}")
+        canvasaddline(f"Nearby Systems: {galaxy[current_system][links]}")
         current_planet = 1
         current_spot = 1
         numberofstars = 0
         for x in galaxy[current_system]["stars"]:
             numberofstars += 1
-        print(f"Number of Stars: {numberofstars}")
-        print(f"Number of Planets: {len(galaxy[current_system]['planets'])}")
+        canvasaddline(f"Number of Stars: {numberofstars}")
+        canvasaddline(f"Number of Planets: {len(galaxy[current_system]['planets'])}")
 
         if len(galaxy[current_system]["planets"]) == 0:
-            print("No Planets in this system")
+            canvasaddline("No Planets in this system")
         # this goes through the list that holds the planets. each version of X holds the entire planet data
         for x in galaxy[current_system]["planets"]:
-            print(eval(planetpath)[name] + "; " + eval(planetpath)["Type"])
+            canvasaddline(eval(planetpath)[name] + "; " + eval(planetpath)["Type"])
             current_spot += 1
 
     elif input1.lower == "help":
-        print("Guide for the `System` command")
-        print("Format: /system info")
-        print("This will provide some information about the current system")
+        canvasaddline("Guide for the `System` command")
+        canvasaddline("Format: /system info")
+        canvasaddline("This will provide some information about the current system")
 
 
 def gotocommand(input1="help", input2="help"):
@@ -248,15 +263,14 @@ def gotocommand(input1="help", input2="help"):
             if x == int(input2):
                 playership.system = "system" + str(x)
                 name = "Name"
-                print(f"Player is now in System {x}: {galaxy[playership.system][name]}")
+                canvasaddline(f"Player is now in System {x}: {galaxy[playership.system][name]}")
                 playership.planet = "None"
                 return
 
-        print("System not connected!")
+        canvasaddline("System not connected!")
 
         changesystem()
     elif input1.lower() == "planet":
-        # print("HERE")
         playership.planet = "planet" + input2
         current_system = playership.system
         current_planet = playership.planet
@@ -264,15 +278,15 @@ def gotocommand(input1="help", input2="help"):
         try:
             if len(galaxy[current_system]["planets"]) < current_spot - 1:
                 playership.planet = "None"
-                print("Planet does not exist")
+                canvasaddline("Planet does not exist")
             else:
-                print(f"Now at {playership.planet}")
+                canvasaddline(f"Now at {playership.planet}")
                 pass
 
         except(TypeError):
             pass
     else:
-        print('''
+        canvasaddline('''
         /goto Help Page
         usage: /goto [system/planet] [system number/planet letter]
 
@@ -286,26 +300,27 @@ def gotocommand(input1="help", input2="help"):
         example: /goto planet b
 
 
-        ''')
+        ''', multiline=True)
 
 
 def cpromptbattle():
-    beginbattle()
-    global ship1
-    global ship2
-    global newbattle
-    global cont
-    while cont:
-        print('''
-        Commands:
-        a = Attack
-        b = Board
-        r = Retreat
-        s = Surrender
-        ''')
-        command = input("=")
-        command = command.lower()
-        cont = battlecommand(command, fromscreen=0)
+    canvasaddline("Game> Ship Battle in the Console has been removed for now")
+    # beginbattle()
+    # global ship1
+    # global ship2
+    # global newbattle
+    # global cont
+    # while cont:
+    #     canvasaddline('''
+    #     Commands:
+    #     a = Attack
+    #     b = Board
+    #     r = Retreat
+    #     s = Surrender
+    #     ''', multiline=True)
+    #     command = input("=")
+    #     command = command.lower()
+    #     cont = battlecommand(command, fromscreen=0)
 
 
 def beginbattle():
@@ -318,9 +333,9 @@ def beginbattle():
     ship1 = playership.ship
     shiprefill()
     clearscreen(Windows)
-    print(f"Health: Player {ship1.health} = {ship2.health} Enemy")
-    print(f"Ammo: Player {ship1.ammo} = {ship2.ammo} Enemy")
-    print(f"Crew: Player {ship1.crew} = {ship2.crew} Enemy")
+    canvasaddline(f"Health: Player {ship1.health} = {ship2.health} Enemy")
+    canvasaddline(f"Ammo: Player {ship1.ammo} = {ship2.ammo} Enemy")
+    canvasaddline(f"Crew: Player {ship1.crew} = {ship2.crew} Enemy")
     newbattle = battle(ship1, ship2)
     newbattle.retreat = 0
     cont = True
@@ -333,19 +348,18 @@ def battlecommand(command, fromscreen=1):
     global cont
 
     os.system('cls')
-    print(f"Health: Player {ship1.health} = {ship2.health} Enemy")
-    print(f"Ammo: Player {ship1.ammo} = {ship2.ammo} Enemy")
-    print(f"Crew: Player {ship1.crew} = {ship2.crew} Enemy")
-    # command = input("=")
+    canvasaddline(f"Health: Player {ship1.health} = {ship2.health} Enemy")
+    canvasaddline(f"Ammo: Player {ship1.ammo} = {ship2.ammo} Enemy")
+    canvasaddline(f"Crew: Player {ship1.crew} = {ship2.crew} Enemy")
     commandreturn = newbattle.commands(ship1, ship2, cont, command)
     ship1 = commandreturn[0]
     ship2 = commandreturn[1]
     if (ship2.health <= 0 or ship2.crew <= ship1.crew * 0.25) and cont:
-        print("You Won")
+        canvasaddline("You Won")
         cont = False
     if (ship1.health <= 0 or ship1.crew <= ship2.crew * 0.25) and cont:
         cont = False
-        print("You Lost")
+        canvasaddline("You Lost")
     if newbattle.retreat == 1:
         cont = False
     elif newbattle.retreat == 2:
@@ -366,15 +380,15 @@ def battlecommand(command, fromscreen=1):
 
     if (ship1.health <= 0 or ship1.crew <= ship2.crew * 0.25) and cont:
         cont = False
-        print("You Lost")
+        canvasaddline("You Lost")
     if (ship2.health <= 0 or ship2.crew <= ship1.crew * 0.25) and cont:
-        print("You Won")
+        canvasaddline("You Won")
         cont = False
     if fromscreen == 0:
         return cont
     elif fromscreen == 1 and cont == False:
         resetlowerbuttons()
-        print("Game Over")
+        canvasaddline("Game Over")
 
 
 def planetcommand(input1="help", input2="help"):
@@ -383,34 +397,31 @@ def planetcommand(input1="help", input2="help"):
         current_system = playership.system
         # Current_planet example is planetb
         if current_planet == "None":
-            print("No Planet Selected. First use /goto planet [planet letter]")
+            canvasaddline("No Planet Selected. First use /goto planet [planet letter]")
         else:
             current_spot = planetnumber(current_planet[-1])
             # Current_spot example is a integer, eg. b == 1, d == 3
             try:
                 planet = eval(planetpath)
-                print(f"""Name: {planet["Name"]}""")
-                print(f"""Gravity: {planet["Gravity"]}""")
-                print(f"""Classification: {planet["Type"]}""")
-                print(f"""Subtype: {planet["Subtype"]}""")
-                print(f"""Settled: {planet["Settled"]}""")
+                canvasaddline(f"""Name: {planet["Name"]}""")
+                canvasaddline(f"""Gravity: {planet["Gravity"]}""")
+                canvasaddline(f"""Classification: {planet["Type"]}""")
+                canvasaddline(f"""Subtype: {planet["Subtype"]}""")
+                canvasaddline(f"""Settled: {planet["Settled"]}""")
             except(TypeError):
-                print("Planet Does Not Exist")
+                canvasaddline("Planet Does Not Exist")
     elif input1 == "scan":
         current_planet = playership.planet
         current_system = playership.system
         # Current_planet example is planetb
         if current_planet == "None":
-            print("No Planet Selected. First use /goto planet [planet letter]")
+            canvasaddline("No Planet Selected. First use /goto planet [planet letter]")
         else:
             current_spot = int(planetnumber(current_planet[-1]))
             # Current_spot example is a integer, eg. b == 1, d == 3
-            print("YODALOAHIOI")
             galaxy[current_system]["planets"][current_spot - 1][f"planet{current_spot}"]["HasBeenScannned"] = True
             try:
                 planet = eval(planetpath)
-
-                # print(f"""Name: {planet["Core"]}""")
                 for value in planet["Core"]:
                     if value == "crust":
                         highestvalue = ""
@@ -419,8 +430,8 @@ def planetcommand(input1="help", input2="help"):
                                 highestvalue = element
                             if planet["Core"]["crust"][element] > planet["Core"]["crust"][highestvalue]:
                                 highestvalue = element
-                        print(f'''Most abundant resource is {highestvalue} at {planet["Core"]["crust"][highestvalue]
-                        }%''')
+                        canvasaddline(f'''Most abundant resource is {highestvalue} at {planet["Core"]["crust"]
+                        [highestvalue]}%''')
                     elif value == "atmo":
                         highestvalue = ""
                         for element in planet["Core"]["atmo"]:
@@ -428,25 +439,23 @@ def planetcommand(input1="help", input2="help"):
                                 highestvalue = element
                             if planet["Core"]["atmo"][element] > planet["Core"]["atmo"][highestvalue]:
                                 highestvalue = element
-                        print(f'''Most abundant resource is {highestvalue} at {planet["Core"]["atmo"][highestvalue
-                        ]}%''')
-                resourcegrid()
+                        canvasaddline(f'''Most abundant resource is {highestvalue} at {planet["Core"]
+                        ["atmo"][highestvalue]}%''')
+                loadscreen()
             except(TypeError):
-                print("Planet Does Not Exist")
+                canvasaddline("Planet Does Not Exist")
 
     elif input1.lower() == "mine":
         current_planet = playership.planet
         current_system = playership.system
         # Current_planet example is planetb
         if current_planet == "None":
-            print("No Planet Selected. First use /goto planet [planet letter]")
+            canvasaddline("No Planet Selected. First use /goto planet [planet letter]")
         else:
             current_spot = planetnumber(current_planet[-1])
             # Current_spot example is a integer, eg. b == 1, d == 3
             try:
                 planet = eval(planetpath)
-                # print(f"""Name: {planet["Core"]}""")
-                # galaxy[current_system]["planets"]
                 for value in planet["Core"]:
                     if value == "crust":
                         highestvalue = ""
@@ -464,8 +473,6 @@ def planetcommand(input1="help", input2="help"):
                             if planet["Core"]["atmo"][element] > planet["Core"]["atmo"][highestvalue]:
                                 highestvalue = element
                             elementrating = planet["Core"]["atmo"][highestvalue]
-
-                # print(f"{playership.ship.inventory}")
                 total_used_space = 0
                 for x in playership.ship.hold:
                     total_used_space += playership.ship.hold[x]
@@ -480,46 +487,69 @@ def planetcommand(input1="help", input2="help"):
                         playership.ship.hold[highestvalue] += round(additionalspace, 2)
                         playership.ship.hold[highestvalue] = round(playership.ship.hold[highestvalue], 2)
                     else:
-                        print(f"Not Enough Space. Max Storage: {playership.ship.inventory}")
+                        canvasaddline(f"Not Enough Space. Max Storage: {playership.ship.inventory}")
                 else:
                     if total_used_space == playership.ship.inventory:
-                        print(f"Not Enough Space. Max Storage: {playership.ship.inventory}")
+                        canvasaddline(f"Not Enough Space. Max Storage: {playership.ship.inventory}")
                     else:
-                        print("Mining Failed")
+                        canvasaddline("Mining Failed")
                 for x in playership.ship.hold:
                     if playership.ship.hold[x] > 0:
-                        print(f"{x}: {playership.ship.hold[x]}")
+                        canvasaddline(f"{x}: {playership.ship.hold[x]}")
             except(TypeError):
-                print("Planet Does Not Exist")
+                canvasaddline("Planet Does Not Exist")
     else:
-        print('''
+        canvasaddline('''
         /planet Help Page
         usage: /planet [info]
-
         /planet info 
         -Will show you a summary of the planet
+        ''', multiline=True)
 
 
-        ''')
 
-
-print("Welcome to Galaxy Creator")
-print("Use / to start a command. Try /help")
 answer = "Hi"
+# global gamestoppedatload
+gamestoppedatload = False
+def newgalaxy(starcount):
+    global playership
 
-
+    makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=False)
 
 # makecommand("galaxy", "100", "False")
-import json
+try:
+    import json
+    with open('player.json') as playerfile:
+        loadingplayer = json.load(playerfile)
+    playership = player.Player(reloading=loadingplayer)
+except:
+    playership = player.Player()
+gamestoppedatload = False
+try:
 
-with open('systems.json') as json_file:
-    galaxy = json.load(json_file)
+    import json
 
-with open('player.json') as playerfile:
-    loadingplayer = json.load(playerfile)
+    with open('systems.json') as json_file:
+        galaxy = json.load(json_file)
 
-playership = player.Player(reloading=loadingplayer)
-# print(playership.ship.crew)
+except:
+
+    gamestoppedatload = True
+    createwindow = Tk()
+    Texthere = Label(createwindow, text="New Galaxy")
+    Texthere.grid(column=1, row=0)
+    loadbutton1 = Button(createwindow, text="Small", command=lambda: newgalaxy(50), width=20)
+    loadbutton1.grid(column=0, row=1)
+    loadbutton2 = Button(createwindow, text="Medium", command=lambda: newgalaxy(100), width=20)
+    loadbutton2.grid(column=1, row=1)
+    loadbutton3 = Button(createwindow, text="Large", command=lambda: newgalaxy(200), width=20)
+    loadbutton3.grid(column=2, row=1)
+
+    while gamestoppedatload == True:
+        createwindow.update()
+    createwindow.destroy()
+
+
 def ignorethis():
     pass
 
@@ -561,14 +591,11 @@ def changeplanets():
     resetlowerbuttons()
     current_system = playership.system
     planetlist = galaxy[current_system]["planets"]
-    # print(planetlist)
     planetcode = 1
     for x in range(0, len(planetlist)):
         myplanet = "planet" + str(planetcode)
         planetvalue = planetletter(planetcode)
-        # print(planetvalue)
         planetcode += 1
-        # print(myplanet)
         newstring = f'''btn{x + 9}.configure(text=f"{myplanet.upper()}", command=lambda: gotocommand(input1="planet", 
         input2="{planetvalue}"))'''
         exec(newstring)
@@ -591,7 +618,7 @@ def changesystemupdate(input2):
     global canvasgrid
     gotocommand(input1="system", input2=input2)
     changesystem()
-    resourcegrid()
+    loadscreen()
 
 
 
@@ -614,6 +641,10 @@ def systembutton():
     btn10.configure(text="System Stats", command=lambda: systemcommand(input1="info"))
     pass
 
+def dumpcargo():
+    for x in playership.ship.hold:
+        playership.ship.hold[x] = 0
+    canvasaddline(playership.ship.hold)
 
 def planetbutton():
     resetlowerbuttons()
@@ -629,6 +660,7 @@ def shipbutton():
     btn10.configure(text="Refill Stats", command=lambda: shiprefill())
     btn11.configure(text="Generate Ship", command=lambda: shipgeneratebutton())
     btn12.configure(text="Player Info", command=lambda: shipcommand(input1="info"))
+    btn13.configure(text="Dump Cargo", command=lambda: dumpcargo())
 
 
 def shipbattlebutton():
@@ -645,14 +677,14 @@ def shiprefill():
     playership.ship.ammo = playership.ship.maxammo
     playership.ship.crew = playership.ship.crewcapacity
     clearscreen(Windows)
-    print("Player Ship Stats Reset")
-    print(f'''
+    canvasaddline("Player Ship Stats Reset")
+    canvasaddline(f'''
     Health = {playership.ship.health}
     Ammo = {playership.ship.ammo}
     Crew = {playership.ship.crew}
     
     
-    ''')
+    ''', multiline=True)
 
 
 def shipgeneratebutton():
@@ -689,7 +721,7 @@ def regenerategalaxy(starcount):
 
     makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=False)
     playership = player.Player()
-    print("New Galaxy Generated. Remember to Save the galaxy to keep changes")
+    canvasaddline("New Galaxy Generated. Remember to Save the galaxy to keep changes")
 
 def regenerategalaxyv2():
     btn9.configure(text="Small", command=lambda: regenerategalaxy(50))
@@ -708,17 +740,24 @@ def loadgame():
     playership = player.Player(reloading=loadingplayer)
 
 def testView():
-    clearscreen(Windows)
-    value = 0
-    currentsystem = playership.system
-    for x in galaxy[currentsystem]["planets"]:
-        if x[f"planet{value + 1}"]["Type"] != "Gas Giant" and x[f"planet{value + 1}"]["Type"] != "Ice Giant":
-            print(x[f"planet{value + 1}"]["Core"]["crust"])
-        else:
-            print(x[f"planet{value + 1}"]["Core"]["atmo"])
-        value += 1
-    if len(galaxy[currentsystem]["planets"]) == 0:
-        print("No Planets")
+    # clearscreen(Windows)
+    # value = 0
+    # currentsystem = playership.system
+    # for x in galaxy[currentsystem]["planets"]:
+    #     if x[f"planet{value + 1}"]["Type"] != "Gas Giant" and x[f"planet{value + 1}"]["Type"] != "Ice Giant":
+    #         canvasaddline(x[f"planet{value + 1}"]["Core"]["crust"])
+    #     else:
+    #         canvasaddline(x[f"planet{value + 1}"]["Core"]["atmo"])
+    #     value += 1
+    # if len(galaxy[currentsystem]["planets"]) == 0:
+    #     canvasaddline("No Planets")
+    current_planet = playership.planet
+    current_system = playership.system
+    current_spot = 1
+    for x in range(0, len(galaxy[current_system]["planets"])):
+        galaxy[current_system]["planets"][current_spot - 1][f"planet{current_spot}"]["HasBeenScannned"] = True
+        current_spot += 1
+    loadscreen()
 
 
 def savegame():
@@ -728,10 +767,9 @@ def savegame():
     try:
         with open('player.json', 'w') as fp:
             fp.write(json_object)
-            print("Playerdata Saved")
+            canvasaddline("Playerdata Saved")
     except:
-        # print("BROKE HERE")
-        print("Playerdata Failed to Save. Please submit save file")
+        canvasaddline("Playerdata Failed to Save. Please submit save file")
         pass
 
     json_object = json.dumps(galaxy, default=lambda o: o.__dict__, sort_keys=False, indent=2)
@@ -739,16 +777,16 @@ def savegame():
     try:
         with open('systems.json', 'w') as fp:
             fp.write(json_object)
-            print("Galaxy Saved")
+            canvasaddline("Galaxy Saved")
     except:
-        print("Galaxy Failed to Save. Please Submit Save File")
+        canvasaddline("Galaxy Failed to Save. Please Submit Save File")
         pass
 def resourcegrid():
     global newlabel
     global canvasgrid
-    canvasgrid.destroy()
-    canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
-    canvasgrid.pack()
+    canvasgrid.delete()
+    # canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
+    # canvasgrid.place(x=canvasgridx, y=canvasgridy)
     currentsystem = playership.system
     elements = {
         "Ice": 2,
@@ -764,25 +802,30 @@ def resourcegrid():
         "Hydrogen": 12,
         "Helium": 13
     }
-
+    borderwidth = 1
     for value1 in range(1, len(elements) + 3):
 
         for cell in range(1, 10):
             if value1 == 2:
-                newlabel = Label(canvasgrid, text="", borderwidth=13, relief="solid", width=13)
+                newlabel = Label(canvasgrid, text="", borderwidth=borderwidth, relief="solid", width=11)
+                newlabel.grid(column=value1 - 1, row=cell)
+            elif value1 == 10 or value1 == 11 or value1 == 12:
+                newlabel = Label(canvasgrid, text="", borderwidth=borderwidth, relief="solid", width=10)
                 newlabel.grid(column=value1 - 1, row=cell)
             else:
-                newlabel = Label(canvasgrid, text="", borderwidth=10, relief="solid", width=11)
+                newlabel = Label(canvasgrid, text="", borderwidth=borderwidth, relief="solid", width=9)
                 newlabel.grid(column=value1 - 1, row=cell)
     maxlocations = len(elements) - 1
-    newlabel = Label(canvasgrid, text="Planet", borderwidth=10, relief="solid", width=11)
+    newlabel = Label(canvasgrid, text="Planet", borderwidth=borderwidth, relief="solid", width=9)
     newlabel.grid(column=0, row=1)
-    newlabel = Label(canvasgrid, text="Type", borderwidth=13, relief="solid", width=13)
+    newlabel = Label(canvasgrid, text="Type", borderwidth=borderwidth, relief="solid", width=11)
     newlabel.grid(column=1, row=1)
     location = 2
     for value in elements:
-        print(value)
-        newlabel = Label(canvasgrid, text=value, borderwidth=10, relief="solid", width=11)
+        if value == "Magnesium" or value == "Potassium" or value == "Aluminum":
+            newlabel = Label(canvasgrid, text=value, borderwidth=borderwidth, relief="solid", width=10)
+        else:
+            newlabel = Label(canvasgrid, text=value, borderwidth=borderwidth, relief="solid", width=9)
         newlabel.grid(column=location, row=1)
         newlabel.configure()
         location += 1
@@ -791,95 +834,259 @@ def resourcegrid():
 
         value = 0
         newrow = 2
-        for x in galaxy[currentsystem]["planets"]:
-            print(x[f"planet{value + 1}"]["HasBeenScannned"])
+        for value2 in range(0, len(galaxy[currentsystem]["planets"])):
+            x = galaxy[currentsystem]["planets"][value2]
             if x[f"planet{value + 1}"]["HasBeenScannned"]:
                 if x[f"planet{value + 1}"]["Type"] != "Gas Giant" and x[f"planet{value + 1}"]["Type"] != "Ice Giant":
                     for crustvalue in x[f"planet{value + 1}"]["Core"]["crust"]:
-                        newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Core"]["crust"][crustvalue],
-                                         borderwidth=10, relief="solid", width=11)
+                        if 9 <= elements[crustvalue] <= 11:
+                            newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Core"]["crust"][crustvalue],
+                                             borderwidth=borderwidth, relief="solid", width=10)
+                        else:
+                            newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Core"]["crust"][crustvalue],
+                                             borderwidth=borderwidth, relief="solid", width=9)
+
                         newlabel.grid(column=elements[crustvalue], row=newrow)
                 else:
                     for crustvalue in x[f"planet{value + 1}"]["Core"]["atmo"]:
                         newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Core"]["atmo"][crustvalue],
-                                         borderwidth=10, relief="solid", width=11)
+                                         borderwidth=borderwidth, relief="solid", width=9)
                         newlabel.grid(column=elements[crustvalue], row=newrow)
-            newlabel = Label(canvasgrid, text=f"planet{value + 1}", borderwidth=10, relief="solid", width=11)
+            newlabel = Label(canvasgrid, text=f"planet{value + 1}", borderwidth=borderwidth, relief="solid", width=9)
             newlabel.grid(column=0, row=newrow)
-            newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Type"], borderwidth=10, relief="solid", width=13)
+            newlabel = Label(canvasgrid, text=x[f"planet{value + 1}"]["Type"], borderwidth=borderwidth,
+                             relief="solid", width=11)
             newlabel.grid(column=1, row=newrow)
             value += 1
             newrow += 1
 
+def loadscreen():
 
-def console():
-    while True:
-        # No Touch \/
-        current_system = playership.system
+    resourcegrid()
+    # canvaspolygon()
 
-        # No Touch /\
+def canvaspolygon():
+    global consolecanvas
+    global window
+    global testhere
+    global cmdEntry
+    if screenwidth == 1:
+        rx1 = 368
+        rx2 = 983
+        entryx = 404
+        btx = 370
+    if screenheight == 1:
+        ry1 = 10
+        ry2 = 600
+        entryy = 578
+        btny = 574
+    elif screenheight == 2:
+        ry1 = 10
+        ry2 = 500
+        entryy = 478
+        btny = 474
 
-        command = input("Input Command:")
-        clearscreen(Windows)
-        try:
-            command[0].lower()
-            if command[0] == "/" or command.lower() == "exit":
-                command = command.split()
-                spot = 0
-                for value in command:
-                    if value == "True":
-                        command[spot] = True
-                    elif value.lower() == "false":
-                        command[spot] = False
-                    spot += 1
+    consolecanvas.destroy()
+    consolecanvas = Canvas(window, width=consolecanvaswidth, height=consolecanvaslength, highlightthickness=0)
+    consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
+    # btnnew = Button(consolecanvas, text="Travel", command=lambda: callingforinput(), width=20)
+    # btnnew.place(x=200, y=200)
+    consolecanvas.place(x=consolecanvasx, y=consolecanvasy)
+    cmdEntry = Entry(consolecanvas, width=95)
+    cmdEntry.place(x=entryx, y=entryy)
+    # style = ttk.Style()
+    # style.configure("TButton", foreground="green", background="orange")
+    cmdbutton = Button(consolecanvas, text="->", width=3, bg="Green", fg="White", command=submitconsoleline)
+    cmdbutton.place(x=btx, y=btny)
 
-                if command[0].lower() == "/help":
-                    helpcommand()
-                    input("Any button to continue")
-                elif command[0] == "/make":
+def submitconsoleline():
+    global waitingoninput
+    if waitingoninput == True:
+        saveitemtofile()
+    else:
+        global testhere
+        global cmdEntry
+        console(cmdEntry.get())
+def saveitemtofile():
+    global whileanswer
+    global cmdEntry
+    global inputs
+    global globalplanet
+    json_object = json.dumps(globalplanet["data"], default=lambda o: o.__dict__, sort_keys=False, indent=4)
 
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    answer = makecommand(command[1], command[2], command[3])
-                elif command[0] == "/ship":
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    shipcommand(command[1], command[2], command[3])
-                elif command[0] == "/system":
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    systemcommand(command[1], command[2], command[3])
-                elif command[0] == "/goto":
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    gotocommand(command[1], command[2])
-                elif command[0] == "/planet":
-                    # print("HERE")
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    command.append("vacantslot")
-                    planetcommand(command[1], command[2])
+    try:
+        with open(f'my{globalplanet["type"]}.json', 'w') as fp:
+            fp.write(json_object)
+    except:
+        canvasaddline("Program Broke at Make Moon")
+        pass
+def clearentry():
+    global testhere
+    global cmdEntry
+    cmdEntry.delete(0, 100)
 
 
-                elif command[0].lower() == "/exit" or command[0].lower() == "exit":
-                    break
 
-        except(IndexError):
+def canvasaddline(myline, multiline=False):
+    global consolecanvas
+    global window
+    global currentlines
+    global galaxy
+    name = "Name"
+    if screenwidth == 1:
+        rx1 = 368
+        rx2 = 983
+        entryx = 404
+        btx = 370
+        startingx = 400
+    if screenheight == 1:
+        ry1 = 10
+        ry2 = 600
+        entryy = 578
+        btny = 574
+        startingy = 460
+    elif screenheight == 2:
+        ry1 = 10
+        ry2 = 500
+        entryy = 478
+        btny = 474
+        startingy = 460
+    # myline = str(f"Player is now in System {1}: {galaxy[playership.system][name]}")
+    thisvalue = {
+        "line": myline,
+        "multiline": multiline
+    }
+    currentlines.append(thisvalue)
+    # startingx = 400
+    # startingy = 560
+    consolecanvas.delete("all")
+    consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
+    if len(currentlines) > 30:
+        del currentlines[0]
+
+    for value in range(len(currentlines) - 1, -1, -1):
+        if startingy < 20:
             pass
+        else:
+            if currentlines[value]['multiline'] == True:
+                x = currentlines[value]['line'].split("\n")
+                for newx in range(len(x) - 1, 0, -1):
+                    newx = x[newx]
+                    if startingy < 20:
+                        pass
+                    else:
+                        consolecanvas.create_text(startingx, startingy, text=newx,
+                                                  justify=LEFT, anchor=W)
+                        # currentlines.append(" ")
+                        startingy -= 20
+                multiline = False
+            else:
+                consolecanvas.create_text(startingx, startingy, text=f"{currentlines[value]['line']}",
+                                                    justify=LEFT, anchor=W)
+                startingy -= 20
+    clearentry()
 
+
+
+
+def console(messagehere = "ignore"):
+    canvasaddline(f"User > {messagehere}")
+    command = messagehere
+    clearscreen(Windows)
+    try:
+        command[0].lower()
+        if command[0] == "/" or command.lower() == "exit":
+            command = command.split()
+            spot = 0
+            for value in command:
+                if value == "True":
+                    command[spot] = True
+                elif value.lower() == "false":
+                    command[spot] = False
+                spot += 1
+            if command[0].lower() == "/help":
+                helpcommand()
+            elif command[0] == "/make":
+                command.append("vacantslot")
+                command.append("vacantslot")
+                command.append("vacantslot")
+                command.append("vacantslot")
+                answer = makecommand(command[1], command[2], command[3], input4=command[4])
+            elif command[0] == "/ship":
+                command.append("vacantslot")
+                command.append("vacantslot")
+                command.append("vacantslot")
+                shipcommand(command[1], command[2], command[3])
+            elif command[0] == "/system":
+                command.append("vacantslot")
+                command.append("vacantslot")
+                command.append("vacantslot")
+                systemcommand(command[1], command[2], command[3])
+            elif command[0] == "/goto":
+                command.append("vacantslot")
+                command.append("vacantslot")
+                command.append("vacantslot")
+                gotocommand(command[1], command[2])
+            elif command[0] == "/planet":
+                command.append("vacantslot")
+                command.append("vacantslot")
+                command.append("vacantslot")
+                planetcommand(command[1], command[2])
+            elif command[0] == "/save":
+                savegame()
+            elif command[0] == "/load":
+                loadgame()
+            # elif command[0].lower() == "/exit" or command[0].lower() == "exit":
+            #     break
+    except(IndexError):
+        pass
+# if globalheight >= 1440:
+screenheight = 2
+
+
+
+# if globalwidth >= 2560:
+screenwidth = 1
+
+
+
+canvas1x = 10
+canvas1y = 10
+
+canvasgridx = 10
+canvasgridy = 70
+
+consolecanvasx = 0
+consolecanvasy = 250
+consolecanvaswidth = 1000
+consolecanvaslength = 1000
+
+inputs = "ignore"
+waitingoninput = False
+globalplanet = {}
 
 window = Tk()
+# window.attributes('-fullscreen', True)
 window.title("Galactic Explorer")
-window.config(padx=100, pady=50)
-canvas = Canvas(window, width=1000, height=1000, highlightthickness=0)
-canvas.pack()
+
+window.config(padx=100, pady=50, height=globalheight, width=globalwidth)
+canvas = Canvas(window, width=1000, height=300, highlightthickness=0)
+canvas.place(x=canvas1x, y=canvas1y)
 canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
-canvasgrid.pack()
+canvasgrid.place(x=canvasgridx, y=canvasgridy)
+consolecanvas = Canvas(window, width=consolecanvaswidth, height=consolecanvaslength, highlightthickness=0)
+consolecanvas.create_rectangle(10, 10, 990, 600, fill="white")
+btnnew = Button(consolecanvas, text="Travel", command=lambda: totravel(), width=20)
+btnnew.place(x=200, y=200)
+consolecanvas.place(x=consolecanvasx, y=consolecanvasy)
+
+
 resourcegrid()
+loadscreen()
+canvaspolygon()
+
+canvasaddline("Game> Welcome to Galactic Explorer (Version 0.2.5)")
+canvasaddline("Game> Press a Button to Start")
 
 
 # resourcegrid()
@@ -897,7 +1104,8 @@ if includedebugtoolbar:
 
 
 
-width = 19
+
+width = 16
 # Upper Buttons
 btn1 = Button(canvas, text="Travel", command=lambda: totravel(), width=width)
 btn1.grid(column=0, row=0)

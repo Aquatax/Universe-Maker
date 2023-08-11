@@ -7,7 +7,6 @@ from planetmaker import makeplanet
 
 
 def galaxymakerr(minimum_systems, include_moons=True):
-    # print("HERE")
     # Code by Aquatax
     # Write Below Here \/ \/ \/
 
@@ -57,7 +56,6 @@ def galaxymakerr(minimum_systems, include_moons=True):
     alphalower = []
     for value in alphabet:
         alphalower.append(value.lower())
-    # print(alphalower)
 
     systems = {}
     for x in range(1, number_of_systems + 1 + number_of_overflow_systems):
@@ -129,12 +127,10 @@ def galaxymakerr(minimum_systems, include_moons=True):
     systems_broken = 0
     systems["system1"]["links"] = [2, 3, 4, 5, 6, 7, 8, 9]
 
-    # print(systems["system1"][0]["links"])
     for x in systems["system1"]["links"]:
         selectSystem = f"system{x}"
         systems[selectSystem]["links"].append(1)
 
-    # print(systems)
     for x in range(2, number_of_systems + 1):
 
         SysteminQuestion = f"system{x}"
@@ -175,7 +171,6 @@ def galaxymakerr(minimum_systems, include_moons=True):
         if SysteminQuestion == "system1":
             number_of_planets = randint(4, 9)
         # At most 8 planets. If planet number is 0, it should skip
-        # print(systems[SysteminQuestion]["Name"])
         listplanets = ["Gas Giant", "Ice Giant", "Super Earth", "Rocky Planet", "Dwarf Planet"]
 
         planettypes = {   #This shows the planet types along with the number of points it gets towards star cost
@@ -273,7 +268,6 @@ def galaxymakerr(minimum_systems, include_moons=True):
                     systems[SysteminQuestion]["planets"].append(newplaneta)
         StarProperties = newerstar
         systems[SysteminQuestion]["stars"] = {"Star1": StarProperties}
-        # print(systems[SysteminQuestion]["stars"])
 
         currentstar = 2
         startingpoints = TotalPoints
@@ -322,12 +316,10 @@ def galaxymakerr(minimum_systems, include_moons=True):
 
         if currentstar > 4:
             pass
-            # print(f"{SysteminQuestion}, {currentstar - 1}, {startingpoints}, {TotalPoints}")
 
 
 
 
 
-    # print(lifecounter)
 
     return systems

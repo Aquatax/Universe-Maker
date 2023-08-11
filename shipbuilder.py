@@ -19,11 +19,10 @@ class maksship():
             self.stubborness = reload["stubborness"]
             self.size = reload["size"]
             self.inventory = reload["inventory"]
-            # print("GOT HERE")
+
             # pass
 
         else:
-            # print("GOT HERE TOO")
             shipsizes = ["small", "medium", "large", "massive"]
             types = ["trader", "warship", "diplomat", "transport"]
             if size == "random":
