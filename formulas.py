@@ -103,3 +103,18 @@ adjectives = ["Clouds", "Love", "Pride", "Fall", "Birth", "Hate", "Lust", "Edge"
               "Rays", "Rocks", "Debris", "War", "Battle", "Judge", "Mark", "Arrival", "Grave", "Strength", "Armada",
               "Haven", "Sea", "Surprise", "Maneuver", "Folly", "Victory", "Defeat", "Horde", "Tactics", "Run", "Dream",
               "Theatrics", "Cold", "Heat", "Warmth", "Warning", "Tears", "Teeth", "Kiss", "Rift", "Stranger"]
+Systemnames = {
+    "Warriors": ["Pride", "Fall", "Odyssey", "Remains", "Mark", "End", "Haven", "Folly", "Grave", "Strength", "Run"],
+    "Archers": ["Pride", "Fall", "Odyssey", "Remains", "Mark", "End", "Haven", "Folly", "Rift"],
+    "Lions": ["Den", "Pride", "Grave"],
+    "Mountain": ["Song", "Tear", "Pass", "War", "Rays", "Mist", "Rain"],
+    "Poets": ["Fortune", "Grace", "Melody", "Tale", "Grave", "Strength"],
+    "Adventurers": ["Love", "Pride", "Fall", "Folly", "Theatrics", "Maneuver", "Suprise", "Run", "Haven", "Mark"],
+    "Kings": ["Gambit", "War", "Run", "Armada", "Folly", "Odyssey", "Victory", "Defeat", "Horde"]
+
+
+
+
+
+
+}

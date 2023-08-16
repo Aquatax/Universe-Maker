@@ -15,6 +15,7 @@ class Player:
             self.planet = reloading["planet"]
             self.ship = shipbuilder.maksship(reload=reloading["myship"])
 
+
     def saveship(self):
         newsave = {
             "system" : self.system,
@@ -34,6 +35,7 @@ class Player:
                 "inventory": self.ship.inventory
             }
         }
+
         return newsave
 
 

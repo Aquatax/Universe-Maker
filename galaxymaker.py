@@ -173,7 +173,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
         # At most 8 planets. If planet number is 0, it should skip
         listplanets = ["Gas Giant", "Ice Giant", "Super Earth", "Rocky Planet", "Dwarf Planet"]
 
-        planettypes = {   #This shows the planet types along with the number of points it gets towards star cost
+        planettypes = {  # This shows the planet types along with the number of points it gets towards star cost
             "Gas Giant": 20,
             "Ice Giant": 15,
             "Super Earth": 9,
@@ -181,22 +181,22 @@ def galaxymakerr(minimum_systems, include_moons=True):
             "Dwarf Planet": 2,
         }
 
-        newstar = planetmaker.makeplanet()    #This Prepares planet production
-        if SysteminQuestion == "system1":     #This section is only run if it is the starting system
-            newerstar = newstar.starfactory(wanted_star="G")      #Creates a Yellow Star
+        newstar = planetmaker.makeplanet()  # This Prepares planet production
+        if SysteminQuestion == "system1":  # This section is only run if it is the starting system
+            newerstar = newstar.starfactory(wanted_star="G")  # Creates a Yellow Star
         else:
-            newerstar = newstar.starfactory(wanted_star="random")   #Creates a random star
+            newerstar = newstar.starfactory(wanted_star="random")  # Creates a random star
 
-        if SysteminQuestion == "system1":   #This section is only run if it is the starting system
-            newerstar["Value"] = 100        #This sets the planet points to 100
-            TotalPoints = 100               #This sets the planet points to 100
+        if SysteminQuestion == "system1":  # This section is only run if it is the starting system
+            newerstar["Value"] = 100  # This sets the planet points to 100
+            TotalPoints = 100  # This sets the planet points to 100
         else:
-            TotalPoints = newerstar["Value"]    #This sets TotalPoints to the stars planet points
-        for planetnum in range(0, 9):           #This section creates the planets, up to 8 planets
+            TotalPoints = newerstar["Value"]  # This sets TotalPoints to the stars planet points
+        for planetnum in range(0, 9):  # This section creates the planets, up to 8 planets
             if planetnum == 0:
                 pass
             else:
-                if SysteminQuestion == "system1" and planetnum == 3:         #The first few if statements are for spawn
+                if SysteminQuestion == "system1" and planetnum == 3:  # The first few if statements are for spawn
                     newplanet = planetmaker.makeplanet()
                     planetinfo = newplanet.planetfactory(include_moons=include_moons, forceplanettype="Rocky Planet",
                                                          forcelife=True)
@@ -216,11 +216,11 @@ def galaxymakerr(minimum_systems, include_moons=True):
                     planetinfo = newplanet.planetfactory(include_moons=include_moons, forceplanettype="Ice Giant")
                     cont = True
                 else:
-                    planetchosen = random.choice(listplanets)         # This chooses a random planet
-                    if planettypes[planetchosen] <= TotalPoints:      #This tests if the planet will fit
-                        TotalPoints -= planettypes[planetchosen]      #This subtracts planet points from the system
+                    planetchosen = random.choice(listplanets)  # This chooses a random planet
+                    if planettypes[planetchosen] <= TotalPoints:  # This tests if the planet will fit
+                        TotalPoints -= planettypes[planetchosen]  # This subtracts planet points from the system
                         cont = True
-                    else:         #Planet production completely stops if one is too large
+                    else:  # Planet production completely stops if one is too large
                         cont = False
                         break
                     if SysteminQuestion != "system1" and random.randint(0, 3) == 3:
@@ -317,9 +317,49 @@ def galaxymakerr(minimum_systems, include_moons=True):
         if currentstar > 4:
             pass
 
-
-
-
-
-
     return systems
+
+
+def galaxylinks():
+    import json
+
+    with open('systems.json') as json_file:
+        galaxy = json.load(json_file)
+    system2 = {}
+
+    # print(galaxy["system1"]["links"])
+    for code in range(1, len(galaxy) + 1):
+        mysystemnumber = code
+        mysystem = f"system{mysystemnumber}"
+        systemsnumbered = []
+        for x in galaxy[mysystem]["links"]:
+            systemsnumbered.append([mysystemnumber, x])
+        for rangenumber in range(0, 7):
+            for x in systemsnumbered:
+                mylist = galaxy[f"system{x[-1]}"]["links"]
+                for value in mylist:
+                    cont = True
+                    for value2 in systemsnumbered:
+                        if value == value2[-1]:
+                            cont = False
+                        if len(systemsnumbered) == len(galaxy):
+                            break
+                    if cont:
+                        newlist = []
+                        for newvalue in x:
+                            newlist.append(newvalue)
+                        newlist.append(value)
+                        systemsnumbered.append(newlist)
+                    if len(systemsnumbered) == len(galaxy):
+                        break
+                if len(systemsnumbered) == len(galaxy):
+                    break
+            if len(systemsnumbered) == len(galaxy):
+                break
+        system2[mysystem] = systemsnumbered
+
+        # print(f"{mysystem} is Done")
+    json_object = json.dumps(system2, default=lambda o: o.__dict__, sort_keys=False, indent=4)
+    with open('SystemLinks.json', 'w') as fp:
+        fp.write(json_object)
+    return system2

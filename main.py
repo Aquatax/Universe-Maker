@@ -1,4 +1,6 @@
 # Goal of this file is to be where the input command is and will lead to the other files
+import formulas
+import galaxymaker
 from galaxymaker import galaxymakerr  # This is to allow for galaxy generation
 import planetmaker  # This is for planet generation
 import os  # This is to help with clearing the screen
@@ -11,11 +13,13 @@ from shipbattle import battle  # For the ship battle
 from shipbuilder import maksship  # to Generalte the ship for battle
 # import tkinter.ttk as ttk
 import pyautogui
+import AIships
 
 
 includedebugtoolbar = False
 currentlines = []
 globalwidth, globalheight = pyautogui.size()
+app = "console"
 def clearscreen(Windows):
     # This clears the screen. It works with def changeos to work on both linux and windows without crashing
     if Windows.lower() == "yes":
@@ -509,14 +513,16 @@ def planetcommand(input1="help", input2="help"):
 
 
 answer = "Hi"
+links = 1
 # global gamestoppedatload
 gamestoppedatload = False
 def newgalaxy(starcount):
     global playership
+    global links
 
     makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=False)
+    links = galaxymaker.galaxylinks()
 
-# makecommand("galaxy", "100", "False")
 try:
     import json
     with open('player.json') as playerfile:
@@ -549,7 +555,16 @@ except:
         createwindow.update()
     createwindow.destroy()
 
+try:
 
+    import json
+
+    with open('SystemLinks.json') as json_file:
+        links = json.load(json_file)
+
+except:
+
+    links = galaxymaker.galaxylinks()
 def ignorethis():
     pass
 
@@ -617,6 +632,8 @@ def changesystemupdate(input2):
     global newlabel
     global canvasgrid
     gotocommand(input1="system", input2=input2)
+    if random.randint(0, 1) == 1:
+        moveaiships()
     changesystem()
     loadscreen()
 
@@ -740,18 +757,6 @@ def loadgame():
     playership = player.Player(reloading=loadingplayer)
 
 def testView():
-    # clearscreen(Windows)
-    # value = 0
-    # currentsystem = playership.system
-    # for x in galaxy[currentsystem]["planets"]:
-    #     if x[f"planet{value + 1}"]["Type"] != "Gas Giant" and x[f"planet{value + 1}"]["Type"] != "Ice Giant":
-    #         canvasaddline(x[f"planet{value + 1}"]["Core"]["crust"])
-    #     else:
-    #         canvasaddline(x[f"planet{value + 1}"]["Core"]["atmo"])
-    #     value += 1
-    # if len(galaxy[currentsystem]["planets"]) == 0:
-    #     canvasaddline("No Planets")
-    current_planet = playership.planet
     current_system = playership.system
     current_spot = 1
     for x in range(0, len(galaxy[current_system]["planets"])):
@@ -861,18 +866,20 @@ def resourcegrid():
             newrow += 1
 
 def loadscreen():
-
+    global app
     resourcegrid()
+    if app == "ship":
+        shipsOnScreen()
     # canvaspolygon()
 
-def canvaspolygon():
+def canvaspolygon(app="console"):
     global consolecanvas
     global window
     global testhere
     global cmdEntry
     if screenwidth == 1:
         rx1 = 368
-        rx2 = 983
+        rx2 = 949
         entryx = 404
         btx = 370
     if screenheight == 1:
@@ -887,18 +894,22 @@ def canvaspolygon():
         btny = 474
 
     consolecanvas.destroy()
-    consolecanvas = Canvas(window, width=consolecanvaswidth, height=consolecanvaslength, highlightthickness=0)
-    consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
-    # btnnew = Button(consolecanvas, text="Travel", command=lambda: callingforinput(), width=20)
-    # btnnew.place(x=200, y=200)
-    consolecanvas.place(x=consolecanvasx, y=consolecanvasy)
-    cmdEntry = Entry(consolecanvas, width=95)
-    cmdEntry.place(x=entryx, y=entryy)
-    # style = ttk.Style()
-    # style.configure("TButton", foreground="green", background="orange")
-    cmdbutton = Button(consolecanvas, text="->", width=3, bg="Green", fg="White", command=submitconsoleline)
-    cmdbutton.place(x=btx, y=btny)
-
+    if app == "console":
+        consolecanvas = Canvas(window, width=consolecanvaswidth, height=consolecanvaslength, highlightthickness=0)
+        consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
+        # btnnew = Button(consolecanvas, text="Travel", command=lambda: callingforinput(), width=20)
+        # btnnew.place(x=200, y=200)
+        consolecanvas.place(x=consolecanvasx, y=consolecanvasy)
+        cmdEntry = Entry(consolecanvas, width=90)
+        cmdEntry.place(x=entryx, y=entryy)
+        # style = ttk.Style()
+        # style.configure("TButton", foreground="green", background="orange")
+        cmdbutton = Button(consolecanvas, text="->", width=3, bg="Green", fg="White", command=submitconsoleline)
+        cmdbutton.place(x=btx, y=btny)
+    elif app == "ship":
+        consolecanvas = Canvas(window, width=consolecanvaswidth, height=consolecanvaslength, highlightthickness=0)
+        consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
+        consolecanvas.place(x=consolecanvasx, y=consolecanvasy)
 def submitconsoleline():
     global waitingoninput
     if waitingoninput == True:
@@ -923,7 +934,9 @@ def saveitemtofile():
 def clearentry():
     global testhere
     global cmdEntry
-    cmdEntry.delete(0, 100)
+    global app
+    if app == "console":
+        cmdEntry.delete(0, 100)
 
 
 
@@ -932,10 +945,11 @@ def canvasaddline(myline, multiline=False):
     global window
     global currentlines
     global galaxy
+    global app
     name = "Name"
     if screenwidth == 1:
         rx1 = 368
-        rx2 = 983
+        rx2 = 949
         entryx = 404
         btx = 370
         startingx = 400
@@ -957,37 +971,121 @@ def canvasaddline(myline, multiline=False):
         "multiline": multiline
     }
     currentlines.append(thisvalue)
-    # startingx = 400
-    # startingy = 560
-    consolecanvas.delete("all")
-    consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
-    if len(currentlines) > 30:
-        del currentlines[0]
+    if app == "console":
+        # startingx = 400
+        # startingy = 560
+        consolecanvas.delete("all")
+        consolecanvas.create_rectangle(rx1, ry1, rx2, ry2, fill="white")
+        if len(currentlines) > 30:
+            del currentlines[0]
 
-    for value in range(len(currentlines) - 1, -1, -1):
-        if startingy < 20:
-            pass
-        else:
-            if currentlines[value]['multiline'] == True:
-                x = currentlines[value]['line'].split("\n")
-                for newx in range(len(x) - 1, 0, -1):
-                    newx = x[newx]
-                    if startingy < 20:
-                        pass
-                    else:
-                        consolecanvas.create_text(startingx, startingy, text=newx,
-                                                  justify=LEFT, anchor=W)
-                        # currentlines.append(" ")
-                        startingy -= 20
-                multiline = False
+        for value in range(len(currentlines) - 1, -1, -1):
+            if startingy < 20:
+                pass
             else:
-                consolecanvas.create_text(startingx, startingy, text=f"{currentlines[value]['line']}",
-                                                    justify=LEFT, anchor=W)
-                startingy -= 20
-    clearentry()
+                if currentlines[value]['multiline'] == True:
+                    x = currentlines[value]['line'].split("\n")
+                    for newx in range(len(x) - 1, 0, -1):
+                        newx = x[newx]
+                        if startingy < 20:
+                            pass
+                        else:
+                            consolecanvas.create_text(startingx, startingy, text=newx,
+                                                      justify=LEFT, anchor=W)
+                            # currentlines.append(" ")
+                            startingy -= 20
+                    multiline = False
+                else:
+                    consolecanvas.create_text(startingx, startingy, text=f"{currentlines[value]['line']}",
+                                                        justify=LEFT, anchor=W)
+                    startingy -= 20
+        clearentry()
+shipslist = []
+
+def moveaiships():
+    global aigroup
+    currentspot = 0
+    movements = 0
+    shipsinsystem = []
+    for value in aigroup:
+        if len(value["path"]) - 1 > value["spotinpath"]:
+            aigroup[currentspot]["spotinpath"] += 1
+            aigroup[currentspot]["system"] = aigroup[currentspot]["path"][aigroup[currentspot]["spotinpath"]]
+            movements += 1
+
+        elif len(value["path"]) - 1 == value["spotinpath"]:
+            aigroup[currentspot]['spotinpath'] = 0
+            aigroup[currentspot]["path"] = aichoosesystem(value["system"], random.randint(1, len(systems2)))
+            movements += 1
+        if aigroup[currentspot]["system"] == 1:
+            shipsinsystem.append(aigroup[currentspot]["code"])
+        currentspot += 1
 
 
 
+aigroup = []
+totaltotal = 0
+totalfailed = 0
+errors143 = 0
+
+import json
+with open('SystemLinks.json') as json_file:
+    systems2 = json.load(json_file)
+
+def aichoosesystem(startingvalue, wantedvalue):
+    while True:
+        for value in systems2[f"system{startingvalue}"]:
+            if value[-1] == wantedvalue:
+                if len(value) > 1:
+                    return value
+
+
+
+def createAiShips():
+    global shipslist
+    shipslist = []
+    global links
+    for aiship in range(0, 1000):
+        aiship = AIships.Computer()                  #Creates ship properties
+        dskAiShip = aiship.saveship()                #Saves ship properties
+        dskAiShip["system"] = random.randint(1, len(systems2))
+        startingvalue = dskAiShip["system"]          #Current System
+        wantedvalue = random.randint(1, len(links))  #End of the Path system
+        dskAiShip["path"] = aichoosesystem(startingvalue, wantedvalue)  #Creates a Path
+        aigroup.append(dskAiShip)                   #Adds ship to the list
+
+def changetocanvas():
+    global consolecanvas
+    global app
+    app = "console"
+    canvaspolygon(app)
+    canvasaddline("Game> ")
+def shipsOnScreen():
+    global consolecanvas
+    global app
+    app = "ship"
+    shipsinsystem = []
+
+    for c in aigroup:
+        if f'system{c["system"]}' == playership.system:
+            shipsinsystem.append(c)
+    texty = 30
+    startingx = 400
+    textx = 400
+    canvaspolygon(app)
+    linetext = "______________________________________________________________________________________"
+    for x in shipsinsystem:
+        consolecanvas.create_text(textx, texty, text=linetext, justify=LEFT, anchor=W)
+        texty += 12
+        mytext = consolecanvas.create_text(textx, texty, text=x["code"], justify=LEFT, anchor=W)
+        textx += 100
+        consolecanvas.create_text(textx, texty, text=f'{x["myship"]["size"].upper()} {x["myship"]["shiptype"].upper()}',
+                                  justify=LEFT, anchor=W)
+        textx += 150
+        consolecanvas.create_text(textx, texty, text=f'{x["gov"].upper()}',
+                                  justify=LEFT, anchor=W)
+        texty += 2
+        textx = startingx
 
 def console(messagehere = "ignore"):
     canvasaddline(f"User > {messagehere}")
@@ -1058,8 +1156,14 @@ canvasgridy = 70
 
 consolecanvasx = 0
 consolecanvasy = 250
-consolecanvaswidth = 1000
+consolecanvaswidth = 950
 consolecanvaslength = 1000
+
+# Side Panels
+buttoncanvasx = 955
+buttoncanvasy = 250
+buttoncanvaswidth = 200
+buttoncanvaslength = 1000
 
 inputs = "ignore"
 waitingoninput = False
@@ -1075,19 +1179,43 @@ canvas.place(x=canvas1x, y=canvas1y)
 canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
 canvasgrid.place(x=canvasgridx, y=canvasgridy)
 consolecanvas = Canvas(window, width=consolecanvaswidth, height=consolecanvaslength, highlightthickness=0)
-consolecanvas.create_rectangle(10, 10, 990, 600, fill="white")
+consolecanvas.create_rectangle(10, 10, 940, 600, fill="white")
 btnnew = Button(consolecanvas, text="Travel", command=lambda: totravel(), width=20)
 btnnew.place(x=200, y=200)
 consolecanvas.place(x=consolecanvasx, y=consolecanvasy)
+buttoncanvas = Canvas(window, width=buttoncanvaswidth, height=buttoncanvaslength, highlightthickness=0)
+text = '''S
+H
+I
+P
+S'''
+sidebutton = Button(buttoncanvas, text=text, command=lambda: shipsOnScreen(), width=2)
+sidebutton.place(x=5, y=20)
+text2 = '''C
+O
+N
+S
+O
+L
+E'''
+sidebutton2 = Button(buttoncanvas, text=text2, command=lambda: changetocanvas(), width=2)
+sidebutton2.place(x=5, y=120)
+buttoncanvas.place(x=buttoncanvasx, y=buttoncanvasy)
+# sidetext = buttoncanvas.create_text(10, 20, text="HELLO", angle=270)
+# buttoncanvas.create_rectangle(0, 0, 20, 100, fill="black")
+
+# sidebutton1 = Button(buttoncanvas, text="Travel", command=lambda: totravel(), width=20, angle='90')
+
+
 
 
 resourcegrid()
 loadscreen()
 canvaspolygon()
 
-canvasaddline("Game> Welcome to Galactic Explorer (Version 0.2.5)")
+canvasaddline("Game> Welcome to Galactic Explorer (Version 0.2.6)")
 canvasaddline("Game> Press a Button to Start")
-
+createAiShips()
 
 # resourcegrid()
 
@@ -1099,6 +1227,10 @@ if includedebugtoolbar:
     # Label(newcanvas, text="You can modify this text", font='Helvetica 18 bold').pack()
     btn1 = Button(newcanvas, text="ViewResources", command=lambda: testView(), width=15)
     btn1.grid(column=0, row=0)
+    btn2 = Button(newcanvas, text="GenerateAI", command=lambda: createAiShips(), width=15)
+    btn2.grid(column=1, row=0)
+    btn3 = Button(newcanvas, text="NextAITurn", command=lambda: moveaiships(), width=15)
+    btn3.grid(column=2, row=0)
     newcanvas.pack()
 
 
