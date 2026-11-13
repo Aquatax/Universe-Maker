@@ -13,7 +13,7 @@ from shipbattle import battle  # For the ship battle
 from shipbuilder import maksship  # to Generalte the ship for battle
 # import tkinter.ttk as ttk
 import AIships
-
+ 
 
 includedebugtoolbar = False
 currentlines = []
