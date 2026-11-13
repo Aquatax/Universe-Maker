@@ -12,13 +12,12 @@ from tkinter import *  # For the GUI
 from shipbattle import battle  # For the ship battle
 from shipbuilder import maksship  # to Generalte the ship for battle
 # import tkinter.ttk as ttk
-import pyautogui
 import AIships
 
 
 includedebugtoolbar = False
 currentlines = []
-globalwidth, globalheight = pyautogui.size()
+
 app = "console"
 def clearscreen(Windows):
     # This clears the screen. It works with def changeos to work on both linux and windows without crashing
@@ -542,6 +541,7 @@ except:
 
     gamestoppedatload = True
     createwindow = Tk()
+
     Texthere = Label(createwindow, text="New Galaxy")
     Texthere.grid(column=1, row=0)
     loadbutton1 = Button(createwindow, text="Small", command=lambda: newgalaxy(50), width=20)
@@ -1172,7 +1172,9 @@ globalplanet = {}
 window = Tk()
 # window.attributes('-fullscreen', True)
 window.title("Galactic Explorer")
-
+globalwidth = window.winfo_screenwidth()
+globalheight = window.winfo_screenheight()
+print(globalheight, globalwidth)
 window.config(padx=100, pady=50, height=globalheight, width=globalwidth)
 canvas = Canvas(window, width=1000, height=300, highlightthickness=0)
 canvas.place(x=canvas1x, y=canvas1y)
