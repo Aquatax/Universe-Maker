@@ -829,6 +829,11 @@ def savegame():
 def resourcegrid():
     global newlabel
     global canvasgrid
+    try:
+        for canvaslabels in canvasgrid.winfo_children():
+            canvaslabels.destroy()
+    except:
+        pass
     canvasgrid.delete()
     # canvasgrid = Canvas(window, width=1000, height=1000, highlightthickness=0)
     # canvasgrid.place(x=canvasgridx, y=canvasgridy)

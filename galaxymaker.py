@@ -12,7 +12,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
 
     number_of_systems = round(minimum_systems)
     number_of_overflow_systems = round(minimum_systems / 2)
-
+    print(minimum_systems)
     # Write above here /\ /\ /\
     nouns = formulas.nouns
     adjectives = formulas.adjectives
@@ -136,9 +136,13 @@ def galaxymakerr(minimum_systems, include_moons=True):
         SysteminQuestion = f"system{x}"
         startingLength = len(systems[SysteminQuestion]["links"])
         if startingLength < 8:
+            counter = 0
             while len(systems[SysteminQuestion]["links"]) < 8:
+                counter += 1
+                print("aa", counter)
                 systema = randint(2, number_of_systems + number_of_overflow_systems)
                 while system_checker(systema, x) == True:
+                    print("bb", counter)
                     systema = randint(2, number_of_systems + number_of_overflow_systems)
                 newsysteminquestion = f"system{systema}"
                 if len(systems[newsysteminquestion]["links"]) < 8:
@@ -150,7 +154,8 @@ def galaxymakerr(minimum_systems, include_moons=True):
                         if z == systema:
                             go = 0
                             systems_broken += 1
-                            if SysteminQuestion == number_of_systems:
+                            print("DEBUG: ", SysteminQuestion, "system" + str(number_of_systems))
+                            if SysteminQuestion == "system" + str(number_of_systems):
                                 go = 1
 
                             if systems_broken > 3:
@@ -163,6 +168,8 @@ def galaxymakerr(minimum_systems, include_moons=True):
                         systems[SysteminQuestion]["links"].append(systema)
                 elif x == newsysteminquestion:
                     pass
+                if counter > 100:
+                    break
 
     for x in range(1, number_of_systems + 1 + number_of_overflow_systems):
 
