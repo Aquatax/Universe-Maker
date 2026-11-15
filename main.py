@@ -193,7 +193,7 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
 def shipcommand(input1="help", input2="help", input3="help", input4="help"):
     global Windows
     # clearscreen(Windows)
-    if input1 == "info":
+    if input1 == "stats":
         canvasaddline(f"Crew={playership.ship.crew}/{playership.ship.crewcapacity}")
         canvasaddline(f"Ship Type={playership.ship.size} {playership.ship.shiptype}")
         canvasaddline(f"Health={playership.ship.health}/{playership.ship.maxhealth}")
@@ -217,9 +217,12 @@ def shipcommand(input1="help", input2="help", input3="help", input4="help"):
                 playership.ship = maksship(size="random", shiptype="random")
         clearscreen(Windows)
         shipcommand(input1="info")
+    elif input1 == "info":
+        pass
+    
     else:
         canvasaddline('''
-        /ship info -----------------------------------  Displays player ship stats
+        /ship stats ----------------------------------  Displays player ship stats
         /ship battle  --------------------------------  Begins a battle
         /ship refill  --------------------------------  Resets crew, health, and ammo
         /ship generate [ship class] [ship size] ------  Will change player ship to new ship
@@ -232,7 +235,7 @@ def systemcommand(input1="help", input2="help", input3="help", input4="help"):
     global Windows
     clearscreen(Windows)
     current_system = playership.system
-    if input1 == "info":
+    if input1.lower() == "info":
         links = "links"
         name = "Name"
         canvasaddline(f"System Name: {galaxy[current_system][name]}")
@@ -252,10 +255,46 @@ def systemcommand(input1="help", input2="help", input3="help", input4="help"):
             canvasaddline(eval(planetpath)[name] + "; " + eval(planetpath)["Type"])
             current_spot += 1
 
-    elif input1.lower == "help":
+
+    elif input1.lower() == "scan":
+        current_system = playership.system
+        print(current_system)
+        print(playership.planet)
+        for value in galaxy[current_system]["planets"]:
+            print(value)
+        for current_spot in range(1, 9):        
+            # Current_spot example is a integer, eg. b == 1, d == 3
+            galaxy[current_system]["planets"][current_spot - 1][f"planet{current_spot}"]["HasBeenScannned"] = True
+            try:
+                planet = eval(planetpath)
+                for value in planet["Core"]:
+                    if value == "crust":
+                        highestvalue = ""
+                        for element in planet["Core"]["crust"]:
+                            if highestvalue == "":
+                                highestvalue = element
+                            if planet["Core"]["crust"][element] > planet["Core"]["crust"][highestvalue]:
+                                highestvalue = element
+                        canvasaddline(f'''Most abundant resource is {highestvalue} at {planet["Core"]["crust"]
+                        [highestvalue]}%''')
+                    elif value == "atmo":
+                        highestvalue = ""
+                        for element in planet["Core"]["atmo"]:
+                            if highestvalue == "":
+                                highestvalue = element
+                            if planet["Core"]["atmo"][element] > planet["Core"]["atmo"][highestvalue]:
+                                highestvalue = element
+                        canvasaddline(f'''Most abundant resource is {highestvalue} at {planet["Core"]
+                        ["atmo"][highestvalue]}%''')
+                loadscreen()
+            except(TypeError):
+                canvasaddline("Planet Does Not Exist")
+    else:
         canvasaddline("Guide for the `System` command")
         canvasaddline("Format: /system info")
         canvasaddline("This will provide some information about the current system")
+        canvasaddline("Format: /system scan")
+        canvasaddline("Debug command to scan whole system")
 
 
 def gotocommand(input1="help", input2="help"):
@@ -569,6 +608,7 @@ def ignorethis():
     pass
 
 
+
 # \/  Whether this is a Windows machine or not doesnt matter, it will adjust istelf after the first command
 Windows = "yes"
 
@@ -676,7 +716,7 @@ def shipbutton():
     btn9.configure(text="Simulate Battle", command=lambda: shipbattlebutton())
     btn10.configure(text="Refill Stats", command=lambda: shiprefill())
     btn11.configure(text="Generate Ship", command=lambda: shipgeneratebutton())
-    btn12.configure(text="Player Info", command=lambda: shipcommand(input1="info"))
+    btn12.configure(text="Player Info", command=lambda: shipcommand(input1="stats"))
     btn13.configure(text="Dump Cargo", command=lambda: dumpcargo())
 
 
@@ -869,7 +909,8 @@ def loadscreen():
     global app
     resourcegrid()
     if app == "ship":
-        shipsOnScreen()
+        pass
+        shipsOnScreen("update")
     # canvaspolygon()
 
 def canvaspolygon(app="console"):
@@ -1060,29 +1101,42 @@ def changetocanvas():
     app = "console"
     canvaspolygon(app)
     canvasaddline("Game> ")
-def shipsOnScreen():
+
+shipwindow = 0
+shipcanvas = 0
+def shipsOnScreen(entry1 = "new"):
+    global shipwindow
+    global shipcanvas
     global consolecanvas
     global app
+    if entry1 == "new":
+        shipwindow = Tk()
+        shipwindow.config(height=400, width=400)
+        shipwindow.attributes('-topmost', True)
+    if entry1 == "update":
+        shipcanvas.destroy()
+    
     app = "ship"
+    shipcanvas = Canvas(shipwindow, height=400, width=400)
+    shipcanvas.pack()
     shipsinsystem = []
-
     for c in aigroup:
         if f'system{c["system"]}' == playership.system:
             shipsinsystem.append(c)
     texty = 30
-    startingx = 400
-    textx = 400
+    startingx = 10
+    textx = 10
     canvaspolygon(app)
     linetext = "______________________________________________________________________________________"
     for x in shipsinsystem:
-        consolecanvas.create_text(textx, texty, text=linetext, justify=LEFT, anchor=W)
+        shipcanvas.create_text(textx, texty, text=linetext, justify=LEFT, anchor=W)
         texty += 12
-        mytext = consolecanvas.create_text(textx, texty, text=x["code"], justify=LEFT, anchor=W)
+        mytext = shipcanvas.create_text(textx, texty, text=x["code"], justify=LEFT, anchor=W)
         textx += 100
-        consolecanvas.create_text(textx, texty, text=f'{x["myship"]["size"].upper()} {x["myship"]["shiptype"].upper()}',
+        shipcanvas.create_text(textx, texty, text=f'{x["myship"]["size"].upper()} {x["myship"]["shiptype"].upper()}',
                                   justify=LEFT, anchor=W)
         textx += 150
-        consolecanvas.create_text(textx, texty, text=f'{x["gov"].upper()}',
+        shipcanvas.create_text(textx, texty, text=f'{x["gov"].upper()}',
                                   justify=LEFT, anchor=W)
         texty += 2
         textx = startingx
