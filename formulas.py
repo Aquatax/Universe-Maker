@@ -23,7 +23,7 @@ def mass(formula, volume=0, density=0, weight=0, gravity=0, force=0, acceleratio
     :return:
     '''
     if formula == 1:
-        mass = force * acceleration
+        mass = force / acceleration
     elif formula == 2:
         mass = volume * density
     elif formula == 3:

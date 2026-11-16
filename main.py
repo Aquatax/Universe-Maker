@@ -195,13 +195,14 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
             ''', multiline=True)
     except(KeyError, ValueError):
         canvasaddline('''
-            /make (planet/galaxy/moon/help) (input1) (input2) (input3)
-               -allows you to make a galaxy, planet, or moon
+            /make (planet/galaxy/moon/station/help) (input1) (input2) (input3)
+            -allows you to make a galaxy, planet, moon, or station
             /make galaxy (minimum systems) (include moons: True/False)
             /make planet (forceplanettype: random) (include moons: True/False)
             /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
+            /make station
 
-                    ''', multiline=True)
+            ''', multiline=True)
         return
 
 
@@ -328,12 +329,14 @@ def gotocommand(input1="help", input2="help"):
 
         changesystem()
     elif input1.lower() == "planet":
+        num_planets_in_system = len(galaxy[playership.system]["planets"])
+        print("number of planets is:", num_planets_in_system)
         playership.planet = "planet" + input2
         current_system = playership.system
         current_planet = playership.planet
         current_spot = planetnumber(current_planet[-1])
         try:
-            if len(galaxy[current_system]["planets"]) < current_spot - 1:
+            if len(galaxy[current_system]["planets"]) < current_spot:
                 playership.planet = "None"
                 canvasaddline("Planet does not exist")
             else:
