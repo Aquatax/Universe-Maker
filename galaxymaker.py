@@ -351,7 +351,7 @@ def galaxylinks():
         systemsnumbered = []
         for x in galaxy[mysystem]["links"]:
             systemsnumbered.append([mysystemnumber, x])
-        for rangenumber in range(0, 7):
+        for rangenumber in range(0, 1):
             for x in systemsnumbered:
                 mylist = galaxy[f"system{x[-1]}"]["links"]
                 for value in mylist:

@@ -1089,18 +1089,21 @@ def moveaiships():
     movements = 0
     shipsinsystem = []
     for value in aigroup:
-        if len(value["path"]) - 1 > value["spotinpath"]:
-            aigroup[currentspot]["spotinpath"] += 1
-            aigroup[currentspot]["system"] = aigroup[currentspot]["path"][aigroup[currentspot]["spotinpath"]]
-            movements += 1
+        try:
+            if len(value["path"]) - 1 > value["spotinpath"]:
+                aigroup[currentspot]["spotinpath"] += 1
+                aigroup[currentspot]["system"] = aigroup[currentspot]["path"][aigroup[currentspot]["spotinpath"]]
+                movements += 1
 
-        elif len(value["path"]) - 1 == value["spotinpath"]:
-            aigroup[currentspot]['spotinpath'] = 0
-            aigroup[currentspot]["path"] = aichoosesystem(value["system"], random.randint(1, len(systems2)))
-            movements += 1
-        if aigroup[currentspot]["system"] == 1:
-            shipsinsystem.append(aigroup[currentspot]["code"])
-        currentspot += 1
+            elif len(value["path"]) - 1 == value["spotinpath"]:
+                aigroup[currentspot]['spotinpath'] = 0
+                aigroup[currentspot]["path"] = aichoosesystem(value["system"], random.randint(1, len(systems2)))
+                movements += 1
+            if aigroup[currentspot]["system"] == 1:
+                shipsinsystem.append(aigroup[currentspot]["code"])
+            currentspot += 1
+        except:
+            pass
 
 
 
@@ -1134,8 +1137,17 @@ def createAiShips():
         startingvalue = dskAiShip["system"]          #Current System
         pathgood = False
         while not pathgood:
-            wantedvalue = random.randint(1, len(links))  #End of the Path system
+            mysystem = links["system" + str(startingvalue)]
+            # print(mysystem)
+            try:
+                wantedvalue = random.choice(mysystem)  #End of the Path system
+            except:
+                print("it failed here", mysystem)
+                break
+            # wantedvalue = wantedvalue[::-1]
+            wantedvalue = wantedvalue[-1]
             dskAiShip["path"] = aichoosesystem(startingvalue, wantedvalue)  #Creates a Path
+            print(startingvalue, wantedvalue)
             if dskAiShip["path"] != False:
                 break
         aigroup.append(dskAiShip)                   #Adds ship to the list
