@@ -1,9 +1,9 @@
 {
-    "Type": "Ice Giant",
-    "Gravity": 6.946559226353171,
-    "Mass": 7.608233209317933e+25,
+    "Type": "Dwarf Planet",
+    "Gravity": 0.9240723085897791,
+    "Mass": 1.367347776778699e+22,
     "Ringed": false,
-    "Subtype": "Gaseous",
+    "Subtype": "Barrenworld",
     "Has Life": false,
     "Life Subtypes": "None",
     "Settled": false,
@@ -12,13 +12,20 @@
             "Iron": 55,
             "Nickel": 45
         },
-        "core%": 11,
-        "atmo": {
-            "Hydrogen": 98,
-            "Helium": 2
+        "core%": 23,
+        "mantle": {
+            "Magnesium": 76,
+            "Oxygen": 3,
+            "Silicon": 14,
+            "Sulfur": 7
         },
-        "atmo%": 89,
-        "density": 0.919,
+        "mantle%": 75,
+        "crust": {
+            "Nickel": 33,
+            "Ice": 67
+        },
+        "crust%": 2,
+        "density": 3.326,
         "Core Density": 8.295
     },
     "Moons": []

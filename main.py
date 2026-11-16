@@ -72,6 +72,7 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
     # When making one from scratch
     # Will be used at start to make the galaxy though
     x = planetmaker.makeplanet()
+    global playership
 
     if input4 == "T" or input4 == "True" or input4 == "t" or input4 == "true":
         input4 = True
@@ -168,6 +169,7 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
                     print("creating links...")
                     galaxymaker.galaxylinks()
                     print("hopefully finished links")
+                    playership = player.Player
                 except:
                     canvasaddline("Program Broke at Make Galaxy")
                     pass
@@ -326,12 +328,15 @@ def gotocommand(input1="help", input2="help"):
 
         current_system = playership.system
         for x in galaxy[current_system]["links"]:
-            if x == int(input2):
-                playership.system = "system" + str(x)
-                name = "Name"
-                canvasaddline(f"Player is now in System {x}: {galaxy[playership.system][name]}")
-                playership.planet = "None"
-                return
+            try:
+                if x == int(input2):
+                    playership.system = "system" + str(x)
+                    name = "Name"
+                    canvasaddline(f"Player is now in System {x}: {galaxy[playership.system][name]}")
+                    playership.planet = "None"
+                    return
+            except:
+                canvasaddline("invalid system, requested number not letter")
 
         canvasaddline("System not connected!")
 
