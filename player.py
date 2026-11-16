@@ -10,16 +10,19 @@ class Player:
             self.system = "system1"
             self.ship = shipbuilder.maksship(reload="ignore")
             self.planet = "None"
+            self.cash = 500
         else:
             self.system = reloading["system"]
             self.planet = reloading["planet"]
             self.ship = shipbuilder.maksship(reload=reloading["myship"])
+            self.cash = reloading["cash"]
 
 
     def saveship(self):
         newsave = {
             "system" : self.system,
             "planet" : self.planet,
+            "cash": self.cash,
             "myship" : {
                 "ammo": self.ship.ammo,
                 "crew capacity": self.ship.crewcapacity,

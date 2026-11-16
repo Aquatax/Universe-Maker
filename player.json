@@ -1,14 +1,15 @@
-{
+        {
     "system": "system1",
     "planet": "None",
+    "cash": 500,
     "myship": {
-        "ammo": 14,
-        "crew capacity": 98,
-        "crew": 98,
-        "health": 30,
-        "maxammo": 14,
-        "maxhealth": 30,
-        "fueluse": 7,
+        "ammo": 7,
+        "crew capacity": 108,
+        "crew": 108,
+        "health": 21,
+        "maxammo": 7,
+        "maxhealth": 21,
+        "fueluse": 5,
         "hold": {
             "Hydrogen": 0,
             "Ice": 0,
@@ -23,9 +24,9 @@
             "Potassium": 0,
             "Helium": 0
         },
-        "shiptype": "warship",
-        "stubborness": 10,
+        "shiptype": "trader",
+        "stubborness": 4,
         "size": "large",
-        "inventory": 38
+        "inventory": 78
     }
 }

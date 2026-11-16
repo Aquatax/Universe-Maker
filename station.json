@@ -1,0 +1,28 @@
+{
+  "prices": {
+    "fuel": {
+      "price": 5,
+      "amount": 20
+    },
+    "hydrogen": {
+      "price": 5,
+      "amount": 20
+    },
+    "iron": {
+      "price": 7,
+      "amount": 20
+    }
+  },
+  "weapons": {
+    "ammo": {
+      "price": 7,
+      "amount": 20
+    }
+  },
+  "crew": {
+    "max_crew": 69,
+    "current": 8,
+    "last_turn_checked": 0
+  },
+  "faction": "Solar Empire"
+}

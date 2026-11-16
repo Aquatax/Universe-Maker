@@ -13,7 +13,7 @@ from shipbattle import battle  # For the ship battle
 from shipbuilder import maksship  # to Generalte the ship for battle
 # import tkinter.ttk as ttk
 import AIships
- 
+from station import mkstation
 
 includedebugtoolbar = False
 currentlines = []
@@ -168,6 +168,18 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
             galaxy = galaxydict
             gamestoppedatload = False
             return
+        elif input1 == "station": 
+            new_station = mkstation()
+            station_data = {"prices": new_station.prices, "weapons": new_station.weapons, "crew": new_station.crew, "faction": new_station.faction}
+
+            json_object = json.dumps(station_data, default=lambda o: o.__dict__, sort_keys=False, indent=2)
+            
+            try:
+                with open('station.json', 'w') as fp:
+                    fp.write(json_object)
+            except:
+                canvasaddline("Program Broke at Make Station")
+                pass
 
         else:
             canvasaddline('''

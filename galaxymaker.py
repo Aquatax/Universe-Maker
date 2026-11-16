@@ -4,6 +4,7 @@ import planetmaker
 from formulas import planetnumber
 import formulas
 from planetmaker import makeplanet
+import station as stationmaker
 
 
 def galaxymakerr(minimum_systems, include_moons=True):
@@ -170,6 +171,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
                     pass
                 if counter > 100:
                     break
+                    
 
     for x in range(1, number_of_systems + 1 + number_of_overflow_systems):
 
@@ -254,6 +256,12 @@ def galaxymakerr(minimum_systems, include_moons=True):
                     planetpoint = f"planet{planetnum}"
                     core = planetinfo["core"]
                     name = systems[SysteminQuestion]["Name"] + alphalower[planetnum]
+                    station = {}
+                    if settled:
+                        station_details = stationmaker.mkstation("nerds")
+                        station = {"prices": station_details.prices, "weapons": station_details.weapons, "crew": station_details.crew, "faction": station_details.faction}
+                        print(station)
+                    
                     if settled:
                         lifecounter += 1
 
@@ -269,7 +277,8 @@ def galaxymakerr(minimum_systems, include_moons=True):
                             "Gravity": grav,
                             "HasBeenScannned": False,
                             "Moons": moons,
-                            "Core": core
+                            "Core": core,
+                            "station": station
                         }}
 
                     systems[SysteminQuestion]["planets"].append(newplaneta)
