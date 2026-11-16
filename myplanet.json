@@ -1,0 +1,25 @@
+{
+    "Type": "Ice Giant",
+    "Gravity": 6.946559226353171,
+    "Mass": 7.608233209317933e+25,
+    "Ringed": false,
+    "Subtype": "Gaseous",
+    "Has Life": false,
+    "Life Subtypes": "None",
+    "Settled": false,
+    "core": {
+        "core": {
+            "Iron": 55,
+            "Nickel": 45
+        },
+        "core%": 11,
+        "atmo": {
+            "Hydrogen": 98,
+            "Helium": 2
+        },
+        "atmo%": 89,
+        "density": 0.919,
+        "Core Density": 8.295
+    },
+    "Moons": []
+}

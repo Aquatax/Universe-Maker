@@ -1,11 +1,11 @@
 {
   "prices": {
     "fuel": {
-      "price": 5,
+      "price": 4,
       "amount": 20
     },
     "hydrogen": {
-      "price": 5,
+      "price": 7,
       "amount": 20
     },
     "iron": {
@@ -15,14 +15,14 @@
   },
   "weapons": {
     "ammo": {
-      "price": 7,
+      "price": 5,
       "amount": 20
     }
   },
   "crew": {
-    "max_crew": 69,
-    "current": 8,
+    "max_crew": 49,
+    "current": 14,
     "last_turn_checked": 0
   },
-  "faction": "Solar Empire"
+  "faction": "Republic"
 }

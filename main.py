@@ -50,7 +50,7 @@ def helpcommand():
     /help
     -provides information on commands
     
-    /make (planet/galaxy/moon/help) (input1) (input2) (input3)
+    /make (planet/galaxy/moon/station) (input1) (input2) (input3)
     -allows you to make a galaxy, planet, or moon
     
     /system info
@@ -173,7 +173,9 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
             station_data = {"prices": new_station.prices, "weapons": new_station.weapons, "crew": new_station.crew, "faction": new_station.faction}
 
             json_object = json.dumps(station_data, default=lambda o: o.__dict__, sort_keys=False, indent=2)
-            
+            for entrey in station_data:
+                canvasaddline(entrey.upper() + ":")
+                canvasaddline(station_data[entrey])
             try:
                 with open('station.json', 'w') as fp:
                     fp.write(json_object)
@@ -183,11 +185,12 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
 
         else:
             canvasaddline('''
-            /make (planet/galaxy/moon/help) (input1) (input2) (input3)
-            -allows you to make a galaxy, planet, or moon
+            /make (planet/galaxy/moon/station/help) (input1) (input2) (input3)
+            -allows you to make a galaxy, planet, moon, or station
             /make galaxy (minimum systems) (include moons: True/False)
             /make planet (forceplanettype: random) (include moons: True/False)
             /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
+            /make station
 
             ''', multiline=True)
     except(KeyError, ValueError):
