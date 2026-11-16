@@ -13,7 +13,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
 
     number_of_systems = round(minimum_systems)
     number_of_overflow_systems = round(minimum_systems / 2)
-    print(minimum_systems)
+    # print(minimum_systems)
     # Write above here /\ /\ /\
     nouns = formulas.nouns
     adjectives = formulas.adjectives
@@ -140,10 +140,10 @@ def galaxymakerr(minimum_systems, include_moons=True):
             counter = 0
             while len(systems[SysteminQuestion]["links"]) < 8:
                 counter += 1
-                print("aa", counter)
+                # print("aa", counter)
                 systema = randint(2, number_of_systems + number_of_overflow_systems)
                 while system_checker(systema, x) == True:
-                    print("bb", counter)
+                    # print("bb", counter)
                     systema = randint(2, number_of_systems + number_of_overflow_systems)
                 newsysteminquestion = f"system{systema}"
                 if len(systems[newsysteminquestion]["links"]) < 8:
@@ -155,7 +155,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
                         if z == systema:
                             go = 0
                             systems_broken += 1
-                            print("DEBUG: ", SysteminQuestion, "system" + str(number_of_systems))
+                            # print("DEBUG: ", SysteminQuestion, "system" + str(number_of_systems))
                             if SysteminQuestion == "system" + str(number_of_systems):
                                 go = 1
 
@@ -258,9 +258,10 @@ def galaxymakerr(minimum_systems, include_moons=True):
                     name = systems[SysteminQuestion]["Name"] + alphalower[planetnum]
                     station = {}
                     if settled:
-                        station_details = stationmaker.mkstation("nerds")
+                        govtypes = ["Republic", "Solar Empire", "Coalition", "Pirates"]
+                        station_details = stationmaker.mkstation(random.choice(govtypes))
                         station = {"prices": station_details.prices, "weapons": station_details.weapons, "crew": station_details.crew, "faction": station_details.faction}
-                        print(station)
+                        # print(station)
                     
                     if settled:
                         lifecounter += 1

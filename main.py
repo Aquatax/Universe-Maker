@@ -78,7 +78,7 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
     elif input4 == "F" or input4 == "False" or input4 == "f" or input4 == "false":
         input4 = False
 
-    input4 = bool(input4)
+    # input4 = bool(input4)
     try:
         if input1 == "planet":
             if input2 != "random" and input2 != "1" and input2 != "2" and input2 != "3" and input2 != "4" and \
@@ -155,21 +155,29 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
             # import json
             global galaxy
             # Serializing json
-
-            if not input4:
+            canvasaddline("about to output galaxy")
+            print(input4)
+            if input4:
+                canvasaddline("outputting galaxy...")
                 json_object = json.dumps(galaxydict, default=lambda o: o.__dict__, sort_keys=False, indent=2)
 
                 try:
                     with open('systems.json', 'w') as fp:
                         fp.write(json_object)
+                    print("Hopefully outputted galaxy!")
+                    print("creating links...")
+                    galaxymaker.galaxylinks()
+                    print("hopefully finished links")
                 except:
                     canvasaddline("Program Broke at Make Galaxy")
                     pass
+                
             galaxy = galaxydict
             gamestoppedatload = False
             return
         elif input1 == "station": 
-            new_station = mkstation()
+            govtypes = ["Republic", "Solar Empire", "Coalition", "Pirates"]
+            new_station = mkstation(random.choice(govtypes))
             station_data = {"prices": new_station.prices, "weapons": new_station.weapons, "crew": new_station.crew, "faction": new_station.faction}
 
             json_object = json.dumps(station_data, default=lambda o: o.__dict__, sort_keys=False, indent=2)
@@ -187,7 +195,7 @@ def makecommand(input1="help", input2="help", input3="help", input4=True):
             canvasaddline('''
             /make (planet/galaxy/moon/station/help) (input1) (input2) (input3)
             -allows you to make a galaxy, planet, moon, or station
-            /make galaxy (minimum systems) (include moons: True/False)
+            /make galaxy (minimum systems) (include moons: True/False) (save: True/False)
             /make planet (forceplanettype: random) (include moons: True/False)
             /make moon (forcemoontype: moon1, moon2, moon3, moon4, moon5)
             /make station
@@ -329,22 +337,25 @@ def gotocommand(input1="help", input2="help"):
 
         changesystem()
     elif input1.lower() == "planet":
-        num_planets_in_system = len(galaxy[playership.system]["planets"])
-        print("number of planets is:", num_planets_in_system)
-        playership.planet = "planet" + input2
-        current_system = playership.system
-        current_planet = playership.planet
-        current_spot = planetnumber(current_planet[-1])
-        try:
-            if len(galaxy[current_system]["planets"]) < current_spot:
-                playership.planet = "None"
-                canvasaddline("Planet does not exist")
-            else:
-                canvasaddline(f"Now at {playership.planet}")
-                pass
+        if input2.lower() == ("b" or "c" or "d" or "e" or "f" or "g" or "h" or "i"):
+            num_planets_in_system = len(galaxy[playership.system]["planets"])
+            print("number of planets is:", num_planets_in_system)
+            playership.planet = "planet" + input2
+            current_system = playership.system
+            current_planet = playership.planet
+            current_spot = planetnumber(current_planet[-1])
+            try:
+                if len(galaxy[current_system]["planets"]) < current_spot:
+                    playership.planet = "None"
+                    canvasaddline("Planet does not exist")
+                else:
+                    canvasaddline(f"Now at {playership.planet}")
+                    pass
 
-        except(TypeError):
-            pass
+            except(TypeError):
+                pass
+        else:
+            canvasaddline("Planet does not exist")
     else:
         canvasaddline('''
         /goto Help Page
@@ -575,9 +586,9 @@ gamestoppedatload = False
 def newgalaxy(starcount):
     global playership
     global links
-
-    makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=False)
-    links = galaxymaker.galaxylinks()
+    print("Got here 1")
+    makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=True)
+    
 
 try:
     import json
@@ -794,9 +805,10 @@ def settingsbutton():
 def regenerategalaxy(starcount):
     global playership
 
-    makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=False)
+    makecommand(input1="galaxy", input2=str(starcount), input3="True", input4=True)
+    # links = galaxymaker.galaxylinks()
     playership = player.Player()
-    canvasaddline("New Galaxy Generated. Remember to Save the galaxy to keep changes")
+    canvasaddline("New Galaxy Generated")
 
 def regenerategalaxyv2():
     btn9.configure(text="Small", command=lambda: regenerategalaxy(50))
@@ -1292,7 +1304,7 @@ resourcegrid()
 loadscreen()
 canvaspolygon()
 
-canvasaddline("Game> Welcome to Galactic Explorer (Version 0.2.6)")
+canvasaddline("Game> Welcome to Galactic Explorer (Version 0.3.2.3)")
 canvasaddline("Game> Press a Button to Start")
 createAiShips()
 

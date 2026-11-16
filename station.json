@@ -1,11 +1,11 @@
 {
   "prices": {
     "fuel": {
-      "price": 4,
+      "price": 6,
       "amount": 20
     },
     "hydrogen": {
-      "price": 7,
+      "price": 6,
       "amount": 20
     },
     "iron": {
@@ -15,14 +15,14 @@
   },
   "weapons": {
     "ammo": {
-      "price": 5,
+      "price": 3,
       "amount": 20
     }
   },
   "crew": {
-    "max_crew": 49,
-    "current": 14,
+    "max_crew": 25,
+    "current": 23,
     "last_turn_checked": 0
   },
-  "faction": "Republic"
+  "faction": "Coalition"
 }
