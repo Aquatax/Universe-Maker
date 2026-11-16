@@ -169,7 +169,7 @@ def galaxymakerr(minimum_systems, include_moons=True):
                         systems[SysteminQuestion]["links"].append(systema)
                 elif x == newsysteminquestion:
                     pass
-                if counter > 100:
+                if counter > 500:
                     break
                     
 

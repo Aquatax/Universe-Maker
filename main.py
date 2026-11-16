@@ -342,10 +342,10 @@ def gotocommand(input1="help", input2="help"):
 
         changesystem()
     elif input1.lower() == "planet":
-        if input2.lower() == ("b" or "c" or "d" or "e" or "f" or "g" or "h" or "i"):
+        if input2.lower() in ("b", "c", "d", "e", "f", "g", "h", "i"):
             num_planets_in_system = len(galaxy[playership.system]["planets"])
             print("number of planets is:", num_planets_in_system)
-            playership.planet = "planet" + input2
+            playership.planet = "planet" + input2.lower()
             current_system = playership.system
             current_planet = playership.planet
             current_spot = planetnumber(current_planet[-1])
@@ -1114,11 +1114,12 @@ with open('SystemLinks.json') as json_file:
     systems2 = json.load(json_file)
 
 def aichoosesystem(startingvalue, wantedvalue):
-    while True:
-        for value in systems2[f"system{startingvalue}"]:
-            if value[-1] == wantedvalue:
-                if len(value) > 1:
-                    return value
+    
+    for value in systems2[f"system{startingvalue}"]:
+        if value[-1] == wantedvalue:
+            if len(value) > 1:
+                return value
+    return False
 
 
 
@@ -1131,8 +1132,12 @@ def createAiShips():
         dskAiShip = aiship.saveship()                #Saves ship properties
         dskAiShip["system"] = random.randint(1, len(systems2))
         startingvalue = dskAiShip["system"]          #Current System
-        wantedvalue = random.randint(1, len(links))  #End of the Path system
-        dskAiShip["path"] = aichoosesystem(startingvalue, wantedvalue)  #Creates a Path
+        pathgood = False
+        while not pathgood:
+            wantedvalue = random.randint(1, len(links))  #End of the Path system
+            dskAiShip["path"] = aichoosesystem(startingvalue, wantedvalue)  #Creates a Path
+            if dskAiShip["path"] != False:
+                break
         aigroup.append(dskAiShip)                   #Adds ship to the list
 
 def changetocanvas():
